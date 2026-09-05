@@ -1,8 +1,10 @@
 import os
 import sys
+from io import BytesIO
 from pathlib import Path
 
 import pytest
+from docx import Document
 
 os.environ["DEMO_MODE"] = "true"
 os.environ["AI_FALLBACK_TO_DEMO"] = "true"
@@ -41,13 +43,17 @@ def test_home_page_has_clear_first_use_flow_and_external_assets():
         assert f'<option value="{language}">{label}</option>' in response.text
 
 
-def test_static_frontend_assets_are_served():
+def test_static_frontend_assets_are_served_and_contain_resilience_logic():
     app_js = client.get("/static/app.js")
     css = client.get("/static/styles.css")
     i18n = client.get("/static/i18n.js")
-    assert app_js.status_code == 200 and "saveCurrentAnswer" in app_js.text
+    assert app_js.status_code == 200
+    assert "saveCurrentAnswer" in app_js.text
+    assert "previous_score" in app_js.text
+    assert "sessionStorage" in app_js.text
+    assert ".docx" in app_js.text
     assert css.status_code == 200 and ".dropzone" in css.text
-    assert i18n.status_code == 200 and "isiZulu" not in i18n.text or i18n.status_code == 200
+    assert i18n.status_code == 200 and "window.FDC_I18N" in i18n.text
 
 
 def test_health_reports_research_aware_runtime_capabilities():
@@ -55,12 +61,13 @@ def test_health_reports_research_aware_runtime_capabilities():
     assert response.status_code == 200
     assert response.json() == {
         "status": "ok",
-        "version": "2.2.0",
+        "version": "2.3.0",
         "mode": "demo",
         "fallback_to_demo": True,
         "languages": SUPPORTED,
-        "upload_types": ["pdf", "txt", "md"],
+        "upload_types": ["pdf", "docx", "txt", "md"],
         "research_aware_evaluation": True,
+        "representative_context_sampling": True,
     }
 
 
@@ -126,6 +133,16 @@ def test_research_context_can_improve_evidence_score_when_answer_matches_it():
     assert related["evidence"] > unrelated["evidence"]
 
 
+def test_cross_language_style_answer_is_not_crushed_by_zero_word_overlap():
+    dimensions = score_dimensions(
+        "AI crop support",
+        "What problem does the project solve?",
+        "Mradi huu unasaidia wakulima wadogo kupata ishara ya mapema kabla ya kutafuta msaada wa mtaalamu.",
+        "The project gives smallholder farmers an earlier signal before they seek expert support.",
+    )
+    assert dimensions["relevance"] >= 50
+
+
 def test_unverified_number_is_not_rewarded_as_research_evidence():
     topic = "AI crop support"
     question = "What evidence supports it?"
@@ -159,8 +176,37 @@ def test_extract_plain_text_research_file():
     assert data["truncated"] is False
 
 
+def test_extract_docx_research_file():
+    document = Document()
+    document.add_heading("Community health referral assistant", level=1)
+    document.add_paragraph("This thesis explores a low-resource referral workflow for rural clinics.")
+    buffer = BytesIO()
+    document.save(buffer)
+    response = client.post(
+        "/api/extract",
+        files={"file": ("thesis.docx", buffer.getvalue(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document")},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "thesis.docx"
+    assert data["suggested_topic"] == "Community health referral assistant"
+    assert "rural clinics" in data["text"]
+
+
+def test_long_research_samples_beginning_middle_and_end_instead_of_only_start():
+    body = "BEGIN_MARKER\n" + ("A" * 6500) + "\nMIDDLE_MARKER\n" + ("B" * 6500) + "\nEND_MARKER"
+    response = client.post("/api/extract", files={"file": ("long.txt", body.encode(), "text/plain")})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["truncated"] is True
+    assert data["characters"] <= 12000
+    assert "BEGIN_MARKER" in data["text"]
+    assert "MIDDLE_MARKER" in data["text"]
+    assert "END_MARKER" in data["text"]
+
+
 def test_extract_rejects_unsupported_file_type():
-    response = client.post("/api/extract", files={"file": ("notes.docx", b"not supported", "application/octet-stream")})
+    response = client.post("/api/extract", files={"file": ("notes.xlsx", b"not supported", "application/octet-stream")})
     assert response.status_code == 415
 
 
