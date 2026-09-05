@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-app = FastAPI(title="Final Defence Coach", version="1.1.0")
+app = FastAPI(title="Final Defence Coach", version="1.2.0")
 BASE_DIR = Path(__file__).resolve().parent
 INDEX_FILE = BASE_DIR / "index.html"
 
@@ -24,15 +24,15 @@ Language = Literal["en", "ha"]
 
 
 class ThesisInput(BaseModel):
-    topic: str = Field(min_length=3, max_length=300)
-    abstract: str = Field(min_length=20, max_length=8000)
+    topic: str = Field(min_length=1, max_length=300)
+    abstract: str = Field(default="", max_length=8000)
     language: Language = "en"
 
 
 class AnswerInput(BaseModel):
-    topic: str = Field(min_length=3, max_length=300)
-    question: str = Field(min_length=3, max_length=1000)
-    answer: str = Field(min_length=2, max_length=5000)
+    topic: str = Field(min_length=1, max_length=300)
+    question: str = Field(min_length=1, max_length=1000)
+    answer: str = Field(min_length=1, max_length=5000)
     language: Language = "en"
 
 
@@ -43,52 +43,79 @@ def language_name(language: Language) -> str:
 def demo_questions(topic: str, language: Language) -> list[str]:
     if language == "ha":
         return [
-            f"Wace matsala bincikenka kan '{topic}' yake warwarewa, kuma me ya sa take da muhimmanci?",
-            "Wace hanyar bincike ka zaba, kuma me ya sa ta dace da wannan binciken?",
-            "Mene ne mafi muhimmancin sakamako ko fahimta daga aikinka?",
-            "Mene ne manyan iyakokin bincikenka?",
-            "Idan kana da karin lokaci ko kayan aiki, me za ka inganta ko bincika gaba?",
+            f"Wace matsala bincikenka kan '{topic}' yake warwarewa, kuma wa zai fi amfana da sakamakonsa?",
+            "Me ya sa ka zabi wannan hanyar bincike, kuma wace hanya ce ka yi la'akari da ita amma ka ki amfani da ita?",
+            "Mene ne mafi muhimmancin sakamako daga aikinka, kuma wace shaida ce ta fi goyon bayansa?",
+            "Mene ne babban iyakar bincikenka, kuma ta yaya wannan iyakar ke shafar yadda ya kamata a fassara sakamakon?",
+            "Idan za ka mayar da wannan bincike zuwa mafita ta zahiri, mene ne mataki na gaba kuma yaya za ka auna nasara?",
         ]
 
     return [
-        f"What problem does your research on '{topic}' solve, and why is it important?",
-        "What methodology did you choose, and why was it appropriate for this study?",
-        "What is the most important result or insight from your work?",
-        "What are the main limitations of your research?",
-        "If you had more time or resources, what would you improve or investigate next?",
+        f"What problem does your research on '{topic}' solve, and who benefits most from the result?",
+        "Why did you choose this methodology, and what alternative approach did you consider but reject?",
+        "What is the most important result from your work, and what evidence best supports it?",
+        "What is the biggest limitation of your research, and how should that limitation affect interpretation of the results?",
+        "If you turned this research into a real-world solution, what would you do next and how would you measure success?",
     ]
 
 
+def score_dimensions(answer: str) -> dict[str, int]:
+    words = answer.split()
+    word_count = len(words)
+    has_reasoning = any(token in answer.lower() for token in ["because", "therefore", "evidence", "result", "saboda", "sakamako", "shaida"])
+    has_structure = any(token in answer.lower() for token in ["first", "second", "finally", "na farko", "sannan", "a karshe"])
+
+    clarity = min(95, 58 + min(27, word_count))
+    relevance = min(96, 64 + min(24, word_count // 2))
+    evidence = min(94, 50 + min(28, word_count // 2) + (8 if has_reasoning else 0))
+    confidence = min(93, 54 + min(25, word_count // 2) + (7 if has_structure else 0))
+    return {
+        "clarity": clarity,
+        "relevance": relevance,
+        "evidence": evidence,
+        "confidence": confidence,
+    }
+
+
 def demo_evaluation(payload: AnswerInput) -> dict:
+    dimensions = score_dimensions(payload.answer)
+    score = round(sum(dimensions.values()) / len(dimensions))
     word_count = len(payload.answer.split())
-    score = min(92, 45 + min(35, word_count // 2))
 
     if payload.language == "ha":
-        detail = " kuma ta bayar da cikakken bayani" if word_count >= 35 else ", amma amsar tana da gajarta"
+        length_note = "Amsar tana da kyau a tsawo." if word_count >= 25 else "Amsar tana da dan gajarta; kara hujja guda daya takamaimai."
         feedback = (
-            f"Amsar ta shiga batun kai tsaye{detail}. Don karfafa amsar, fara da babban batu, "
-            "sannan ka kawo takamaiman shaida daga binciken, ka kuma bayyana dalilin muhimmancinta."
+            f"Ka shiga batun kai tsaye. {length_note} Don kara karfi, fara da babban batu, "
+            "ka kawo shaida ko sakamako daya daga binciken, sannan ka bayyana dalilin da ya sa hakan yake da muhimmanci."
         )
         improved = (
-            f"Babban batu shi ne cewa wannan bincike kan {payload.topic} yana magance wata matsala da aka fayyace. "
-            f"A wajen amsa tambayar '{payload.question}', zan fara da muhimmin sakamako ko shawara, "
-            "sannan in goyi bayansa da shaida daga binciken, in bayyana dalili, kuma in ambaci wata iyaka idan ta dace. "
-            "Wannan yana sa amsar ta kasance a takaice, mai hujja, kuma tana da alaka da manufar binciken."
+            f"Babban batu shi ne cewa bincikena kan {payload.topic} yana magance matsala da aka fayyace. "
+            f"Game da tambayar '{payload.question}', zan fara da muhimmin sakamako, in goyi bayansa da shaida daga binciken, "
+            "sannan in bayyana abin da wannan sakamakon yake nufi a aikace da kuma wata iyaka idan ta dace."
         )
+        next_tip = "Yi kokarin amsa cikin sassa uku: batu, shaida, muhimmanci."
     else:
-        detail = " and provided useful detail" if word_count >= 35 else ", but the answer is quite short"
+        length_note = "Your answer has a useful amount of detail." if word_count >= 25 else "Your answer is quite short; add one concrete piece of evidence."
         feedback = (
-            f"You answered the question directly{detail}. Make the response stronger by stating your main point first, "
-            "supporting it with one concrete detail from the research, and ending with the significance of that detail."
+            f"You answered the question directly. {length_note} To make it stronger, lead with your main claim, "
+            "support it with one specific result or piece of evidence, then explain why that evidence matters."
         )
         improved = (
-            f"My main point is that this work on {payload.topic} addresses a clearly defined research problem. "
-            f"In response to the question '{payload.question}', I would first state the key finding or decision, "
-            "then support it with evidence from the study, explain the reasoning behind it, and acknowledge any relevant limitation. "
-            "This makes the answer concise, defensible, and connected to the research objective."
+            f"My main point is that my research on {payload.topic} addresses a clearly defined problem. "
+            f"For the question '{payload.question}', I would state the key finding first, support it with evidence from the study, "
+            "then explain the practical significance and acknowledge a relevant limitation where appropriate."
         )
+        next_tip = "Use a three-part answer: claim → evidence → significance."
 
-    return {"score": score, "feedback": feedback, "improved_answer": improved, "mode": "demo", "language": payload.language}
+    return {
+        "score": score,
+        "dimensions": dimensions,
+        "feedback": feedback,
+        "improved_answer": improved,
+        "next_tip": next_tip,
+        "mode": "demo",
+        "language": payload.language,
+    }
 
 
 def extract_json(text: str) -> dict:
@@ -131,30 +158,36 @@ def home() -> HTMLResponse:
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "demo_mode": DEMO_MODE, "languages": ["en", "ha"]}
+    return {"status": "ok", "demo_mode": DEMO_MODE, "languages": ["en", "ha"], "version": "1.2.0"}
 
 
 @app.post("/api/questions")
 async def generate_questions(payload: ThesisInput) -> dict:
+    topic = payload.topic.strip()
+    abstract = payload.abstract.strip()
+    if not topic:
+        raise HTTPException(status_code=422, detail="Topic cannot be empty")
+
     if DEMO_MODE:
-        return {"questions": demo_questions(payload.topic, payload.language), "mode": "demo", "language": payload.language}
+        return {"questions": demo_questions(topic, payload.language), "mode": "demo", "language": payload.language}
 
     target_language = language_name(payload.language)
+    context = abstract if abstract else "No abstract was provided. Base the questions on the thesis topic and ask broadly useful defence questions."
     result = await call_llm([
         {
             "role": "system",
             "content": (
-                "You are a university thesis defence examiner. Return JSON only with a 'questions' array containing exactly five "
-                f"concise, challenging but fair questions. Write every question in {target_language}."
+                "You are a supportive but rigorous university thesis defence examiner. Return JSON only with a 'questions' array containing exactly five "
+                f"concise, varied, challenging but fair questions. Write every question in {target_language}. Cover problem, methodology, evidence, limitations, and practical impact."
             ),
         },
         {
             "role": "user",
-            "content": f"Thesis topic: {payload.topic}\n\nAbstract: {payload.abstract}",
+            "content": f"Thesis topic: {topic}\n\nResearch context: {context}",
         },
     ])
     questions = result.get("questions")
-    if not isinstance(questions, list) or len(questions) != 5 or not all(isinstance(q, str) for q in questions):
+    if not isinstance(questions, list) or len(questions) != 5 or not all(isinstance(q, str) and q.strip() for q in questions):
         raise HTTPException(status_code=502, detail="LLM did not return exactly five questions")
     return {"questions": questions, "mode": "llm", "language": payload.language}
 
@@ -169,8 +202,9 @@ async def evaluate_answer(payload: AnswerInput) -> dict:
         {
             "role": "system",
             "content": (
-                "Evaluate a student's thesis defence answer. Return JSON only with integer 'score' from 0 to 100, short 'feedback', "
-                f"and 'improved_answer'. Be constructive and specific. Write feedback and improved_answer in {target_language}."
+                "Evaluate a student's thesis defence answer. Return JSON only with: integer 'score' from 0 to 100; object 'dimensions' with integer scores "
+                "for clarity, relevance, evidence, and confidence; short 'feedback'; 'improved_answer'; and one-sentence 'next_tip'. "
+                f"Be constructive and specific. Write feedback, improved_answer, and next_tip in {target_language}."
             ),
         },
         {
@@ -179,16 +213,24 @@ async def evaluate_answer(payload: AnswerInput) -> dict:
         },
     ])
     try:
-        score = int(result["score"])
+        score = max(0, min(100, int(result["score"])))
+        dimensions_raw = result["dimensions"]
+        dimensions = {
+            key: max(0, min(100, int(dimensions_raw[key])))
+            for key in ("clarity", "relevance", "evidence", "confidence")
+        }
         feedback = str(result["feedback"])
         improved_answer = str(result["improved_answer"])
+        next_tip = str(result["next_tip"])
     except (KeyError, TypeError, ValueError) as exc:
         raise HTTPException(status_code=502, detail="LLM evaluation format is invalid") from exc
 
     return {
-        "score": max(0, min(100, score)),
+        "score": score,
+        "dimensions": dimensions,
         "feedback": feedback,
         "improved_answer": improved_answer,
+        "next_tip": next_tip,
         "mode": "llm",
         "language": payload.language,
     }
