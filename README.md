@@ -6,6 +6,8 @@ Minimal AI-powered thesis defence practice coach built for the TNGIMPACT AI Chal
 
 A student enters a thesis topic and short abstract. The app generates five defence-style questions, then evaluates the student's answer and suggests a stronger version.
 
+The interface supports **English and Hausa**. The selected language is also used for generated questions and feedback in both demo mode and real LLM mode.
+
 The project runs in `DEMO_MODE` by default, so judges can test the full flow without an API key. An OpenAI-compatible LLM endpoint can be enabled with environment variables.
 
 ## Stack
@@ -23,10 +25,17 @@ python -m venv venv
 source venv/Scripts/activate   # Git Bash on Windows
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn main:app --reload
+python -m uvicorn main:app --reload
 ```
 
 Open http://127.0.0.1:8000
+
+## Languages
+
+- English (`en`)
+- Hausa (`ha`)
+
+Use the language selector in the web interface. API clients can send `"language": "en"` or `"language": "ha"`.
 
 ## Demo mode
 
@@ -54,7 +63,7 @@ Never commit `.env` or API keys.
 ## API
 
 - `GET /` — web interface
-- `GET /health` — health check
+- `GET /health` — health check and supported languages
 - `POST /api/questions` — generate five defence questions
 - `POST /api/evaluate` — evaluate an answer
 
@@ -66,7 +75,7 @@ pytest -q
 
 ## Why this matters
 
-Students often know their research but have little access to realistic defence practice. This lightweight coach gives repeatable questioning and immediate feedback using only a browser and a small backend.
+Students often know their research but have little access to realistic defence practice. This lightweight coach gives repeatable questioning and immediate feedback using only a browser and a small backend, while bilingual support makes the demo more accessible for local users.
 
 ## License
 
