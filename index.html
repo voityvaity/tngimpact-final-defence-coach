@@ -3,34 +3,161 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
   <title>Final Defence Coach</title>
   <style>
-    :root { font-family: Inter, system-ui, sans-serif; color: #18212f; background: #f5f7fb; }
+    :root {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #142033;
+      background: #f4f7fb;
+      font-synthesis: none;
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 64px; }
-    .hero { background: #111827; color: white; border-radius: 24px; padding: 32px; margin-bottom: 24px; }
-    .hero-top { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
-    .hero h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 3.5rem); }
-    .hero p { margin: 0; color: #d1d5db; max-width: 650px; line-height: 1.6; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% -10%, rgba(37, 99, 235, .16), transparent 32rem),
+        radial-gradient(circle at 100% 4%, rgba(16, 185, 129, .12), transparent 27rem),
+        #f4f7fb;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    .wrap { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0b1220 0%, #15233e 60%, #123b38 100%);
+      color: white;
+      border-radius: 28px;
+      padding: 34px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, .18);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      right: -90px;
+      bottom: -130px;
+      background: rgba(255, 255, 255, .06);
+    }
+    .hero-top { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; color: #a7f3d0; font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .dot { width: 8px; height: 8px; border-radius: 99px; background: #34d399; box-shadow: 0 0 0 5px rgba(52, 211, 153, .12); }
+    .hero h1 { margin: 12px 0 10px; font-size: clamp(2.2rem, 6vw, 4.2rem); line-height: .98; letter-spacing: -.045em; }
+    .hero p { margin: 0; max-width: 720px; color: #cbd5e1; line-height: 1.65; font-size: 1.03rem; }
     .language-box { min-width: 170px; }
-    .language-box label { margin-top: 0; color: #d1d5db; font-size: 13px; }
-    .language-box select { color: #111827; }
-    .badge { display: inline-block; margin-top: 18px; background: #d1fae5; color: #065f46; padding: 7px 11px; border-radius: 999px; font-weight: 700; font-size: 13px; }
-    .card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 24px; margin: 18px 0; box-shadow: 0 8px 30px rgba(17,24,39,.05); }
-    h2 { margin-top: 0; }
-    label { display: block; margin: 16px 0 7px; font-weight: 700; }
-    input, textarea, select { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 13px 14px; font: inherit; background: white; }
-    textarea { min-height: 140px; resize: vertical; }
-    button { border: 0; border-radius: 12px; padding: 13px 18px; font: inherit; font-weight: 800; cursor: pointer; background: #2563eb; color: white; margin-top: 16px; }
-    button:disabled { opacity: .55; cursor: wait; }
-    .muted { color: #64748b; }
-    .hidden { display: none; }
-    .questions { padding-left: 22px; line-height: 1.65; }
-    .score { font-size: 44px; font-weight: 900; margin: 4px 0; }
-    .result-box { background: #f8fafc; border-radius: 14px; padding: 16px; margin-top: 12px; white-space: pre-wrap; line-height: 1.55; }
-    .error { color: #b91c1c; margin-top: 12px; font-weight: 700; }
-    footer { text-align: center; color: #64748b; margin-top: 30px; font-size: 14px; }
+    .language-box label { display: block; margin-bottom: 7px; color: #cbd5e1; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+    select, input, textarea {
+      width: 100%;
+      border: 1px solid #d7deea;
+      border-radius: 13px;
+      padding: 13px 14px;
+      color: #142033;
+      background: #fff;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    input:focus, textarea:focus, select:focus { border-color: #4f7df3; box-shadow: 0 0 0 4px rgba(79, 125, 243, .12); }
+    .hero select { border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.96); }
+    .hero-pills { position: relative; z-index: 1; display: flex; gap: 9px; flex-wrap: wrap; margin-top: 24px; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.13); border-radius: 999px; background: rgba(255,255,255,.07); color: #e2e8f0; font-size: 13px; font-weight: 700; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; margin-top: 22px; align-items: start; }
+    .stack { min-width: 0; }
+    .card {
+      background: rgba(255,255,255,.96);
+      border: 1px solid #e1e7f0;
+      border-radius: 22px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 34px rgba(15, 23, 42, .06);
+    }
+    .card-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 18px; }
+    .step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9px; background: #eaf0ff; color: #2f5ecc; font-weight: 900; margin-right: 9px; font-size: 14px; }
+    h2 { display: flex; align-items: center; margin: 0; font-size: 1.18rem; letter-spacing: -.015em; }
+    h3 { margin: 20px 0 8px; font-size: .98rem; }
+    .subtle { margin: 5px 0 0; color: #66758a; line-height: 1.5; font-size: 14px; }
+    label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 15px 0 7px; font-weight: 800; font-size: 14px; }
+    label small { color: #8a98aa; font-weight: 600; }
+    textarea { min-height: 138px; resize: vertical; line-height: 1.5; }
+    #answer { min-height: 160px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      min-height: 45px;
+      cursor: pointer;
+      font-weight: 850;
+      transition: transform .12s ease, opacity .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:disabled { opacity: .55; cursor: wait; }
+    .btn-primary { color: white; background: linear-gradient(135deg, #315fe6, #2351c8); box-shadow: 0 9px 20px rgba(49,95,230,.22); }
+    .btn-secondary { color: #234; background: #edf2f8; }
+    .btn-ghost { color: #315fe6; background: transparent; border: 1px solid #cfd9ef; }
+    .btn-success { color: #075f46; background: #dff8ee; }
+    .error { min-height: 20px; margin-top: 10px; color: #b42318; font-size: 13px; font-weight: 750; }
+    .status { min-height: 20px; margin-top: 10px; color: #315fe6; font-size: 13px; font-weight: 750; }
+    .hidden { display: none !important; }
+    .questions-grid { display: grid; gap: 10px; margin-top: 12px; }
+    .question-card {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      border: 1px solid #dde4ee;
+      border-radius: 14px;
+      padding: 13px;
+      color: #26364a;
+      background: white;
+      cursor: pointer;
+      line-height: 1.45;
+      transition: border-color .15s, background .15s, transform .12s;
+    }
+    .question-card:hover { border-color: #aebde6; transform: translateY(-1px); }
+    .question-card.active { border-color: #4f7df3; background: #f5f8ff; box-shadow: inset 0 0 0 1px #4f7df3; }
+    .qnum { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9px; background: #edf2ff; color: #315fe6; font-weight: 900; font-size: 13px; }
+    .result-top { display: grid; grid-template-columns: 130px 1fr; gap: 22px; align-items: center; padding: 4px 0 10px; }
+    .score-ring { --score: 0; width: 124px; height: 124px; border-radius: 50%; background: conic-gradient(#26a269 calc(var(--score) * 1%), #e7edf4 0); display: grid; place-items: center; position: relative; }
+    .score-ring::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; background: white; }
+    .score-inner { position: relative; z-index: 1; text-align: center; }
+    .score { font-size: 33px; line-height: 1; font-weight: 950; letter-spacing: -.04em; }
+    .score-caption { margin-top: 4px; color: #718096; font-size: 11px; font-weight: 750; }
+    .breakdown { display: grid; gap: 10px; }
+    .metric-row { display: grid; grid-template-columns: 90px 1fr 34px; gap: 10px; align-items: center; font-size: 12px; font-weight: 750; color: #526276; }
+    .bar { height: 8px; overflow: hidden; border-radius: 999px; background: #e8edf4; }
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #315fe6, #22a06b); }
+    .result-box { border: 1px solid #e1e7f0; background: #f8fafc; border-radius: 14px; padding: 15px; line-height: 1.58; white-space: pre-wrap; color: #334155; }
+    .tip { display: flex; gap: 10px; align-items: flex-start; margin-top: 15px; padding: 13px 14px; border-radius: 14px; background: #fff7df; border: 1px solid #f4df9b; color: #6d5415; line-height: 1.45; font-size: 13px; font-weight: 700; }
+    .side { position: sticky; top: 18px; }
+    .side-card { background: #ffffffd9; backdrop-filter: blur(10px); border: 1px solid #e1e7f0; border-radius: 20px; padding: 20px; margin-bottom: 14px; }
+    .side-title { margin: 0 0 12px; font-size: .95rem; }
+    .how-item { display: grid; grid-template-columns: 25px 1fr; gap: 9px; margin: 11px 0; color: #526276; font-size: 13px; line-height: 1.42; }
+    .how-item b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: #edf2ff; color: #315fe6; font-size: 11px; }
+    .privacy { display: flex; gap: 9px; align-items: flex-start; color: #526276; font-size: 12px; line-height: 1.45; }
+    .mini-badge { display: inline-flex; margin-top: 11px; padding: 6px 9px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 850; }
+    footer { text-align: center; color: #748296; margin-top: 24px; font-size: 12px; }
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .side-card { margin: 0; }
+    }
+    @media (max-width: 600px) {
+      .wrap { width: min(100% - 20px, 1080px); padding-top: 10px; }
+      .hero { border-radius: 20px; padding: 24px 20px; }
+      .hero h1 { font-size: 2.65rem; }
+      .language-box { width: 100%; }
+      .card { border-radius: 18px; padding: 18px; }
+      .side { grid-template-columns: 1fr; }
+      .result-top { grid-template-columns: 1fr; }
+      .score-ring { margin: 0 auto; }
+      .actions .btn { flex: 1 1 140px; }
+      .metric-row { grid-template-columns: 76px 1fr 30px; }
+    }
   </style>
 </head>
 <body>
@@ -38,211 +165,338 @@
     <section class="hero">
       <div class="hero-top">
         <div>
+          <div class="eyebrow"><span class="dot"></span><span id="eyebrow">AI for Education · Africa</span></div>
           <h1>Final Defence Coach</h1>
-          <p id="heroText">Practice a thesis or final-year project defence. Generate examiner-style questions, answer one, and receive immediate structured feedback.</p>
+          <p id="heroText">Practice your thesis defence with examiner-style questions and instant structured feedback — in English or Hausa.</p>
         </div>
         <div class="language-box">
           <label id="languageLabel" for="language">Language</label>
-          <select id="language">
+          <select id="language" aria-label="Language">
             <option value="en">English</option>
             <option value="ha">Hausa</option>
           </select>
         </div>
       </div>
-      <span id="badge" class="badge">TNGIMPACT AI Challenge 2026 · Demo-ready</span>
+      <div class="hero-pills">
+        <span class="pill">⚡ <span id="pillFast">Instant practice</span></span>
+        <span class="pill">🌍 <span id="pillLocal">English + Hausa</span></span>
+        <span class="pill">🔐 <span id="pillPrivacy">No account required</span></span>
+      </div>
     </section>
 
-    <section class="card">
-      <h2 id="step1Title">1. Describe your research</h2>
-      <label id="topicLabel" for="topic">Thesis topic</label>
-      <input id="topic" maxlength="300" placeholder="e.g. Using AI to improve crop disease detection" />
+    <div class="layout">
+      <section class="stack">
+        <section class="card" id="researchCard">
+          <div class="card-head">
+            <div>
+              <h2><span class="step">1</span><span id="step1Title">Add your research</span></h2>
+              <p id="step1Sub" class="subtle">A topic is enough to start. Adding an abstract gives the coach more context.</p>
+            </div>
+          </div>
 
-      <label id="abstractLabel" for="abstract">Short abstract</label>
-      <textarea id="abstract" maxlength="8000" placeholder="Describe the problem, method, results, and significance..."></textarea>
-      <button id="generateBtn">Generate 5 defence questions</button>
-      <div id="generateError" class="error"></div>
-    </section>
+          <label for="topic"><span id="topicLabel">Thesis topic</span><small id="topicHint">required</small></label>
+          <input id="topic" maxlength="300" autocomplete="off" placeholder="e.g. Using AI to improve crop disease detection" />
 
-    <section id="questionsCard" class="card hidden">
-      <h2 id="step2Title">2. Examiner questions</h2>
-      <ol id="questionList" class="questions"></ol>
-      <label id="chooseQuestionLabel" for="questionSelect">Choose a question to answer</label>
-      <select id="questionSelect"></select>
+          <label for="abstract"><span id="abstractLabel">Abstract / project summary</span><small id="abstractHint">optional</small></label>
+          <textarea id="abstract" maxlength="8000" placeholder="Paste your abstract, or leave this empty and start with the topic only."></textarea>
 
-      <label id="answerLabel" for="answer">Your answer</label>
-      <textarea id="answer" maxlength="5000" placeholder="Answer as if you were speaking to the defence panel..."></textarea>
-      <button id="evaluateBtn">Evaluate my answer</button>
-      <div id="evaluateError" class="error"></div>
-    </section>
+          <div class="actions">
+            <button class="btn btn-secondary" id="exampleBtn" type="button">✨ Use example</button>
+            <button class="btn btn-primary" id="generateBtn" type="button">Generate 5 defence questions →</button>
+            <button class="btn btn-ghost" id="clearBtn" type="button">Clear</button>
+          </div>
+          <div id="generateStatus" class="status" aria-live="polite"></div>
+          <div id="generateError" class="error" aria-live="assertive"></div>
+        </section>
 
-    <section id="resultCard" class="card hidden">
-      <h2 id="step3Title">3. Feedback</h2>
-      <div id="scoreLabel" class="muted">Defence readiness score</div>
-      <div id="score" class="score">—</div>
-      <h3 id="feedbackTitle">Coach feedback</h3>
-      <div id="feedback" class="result-box"></div>
-      <h3 id="improvedTitle">Stronger answer structure</h3>
-      <div id="improved" class="result-box"></div>
-    </section>
+        <section id="questionsCard" class="card hidden">
+          <div class="card-head">
+            <div>
+              <h2><span class="step">2</span><span id="step2Title">Choose an examiner question</span></h2>
+              <p id="step2Sub" class="subtle">Pick any question below. You can return and practise the others without regenerating.</p>
+            </div>
+          </div>
+          <div id="questionList" class="questions-grid" role="list"></div>
 
-    <footer id="footerText">Minimal hackathon MVP · No account required · Demo mode works without an API key</footer>
+          <label for="answer"><span id="answerLabel">Your spoken-style answer</span><small id="answerHint">short is fine</small></label>
+          <textarea id="answer" maxlength="5000" placeholder="Answer naturally, as if you were speaking to your defence panel..."></textarea>
+          <div class="actions">
+            <button class="btn btn-secondary" id="sampleAnswerBtn" type="button">Use sample answer</button>
+            <button class="btn btn-primary" id="evaluateBtn" type="button">Evaluate my answer →</button>
+          </div>
+          <div id="evaluateStatus" class="status" aria-live="polite"></div>
+          <div id="evaluateError" class="error" aria-live="assertive"></div>
+        </section>
+
+        <section id="resultCard" class="card hidden">
+          <div class="card-head">
+            <div>
+              <h2><span class="step">3</span><span id="step3Title">Your defence feedback</span></h2>
+              <p id="step3Sub" class="subtle">A quick readiness snapshot, not an academic grade.</p>
+            </div>
+          </div>
+
+          <div class="result-top">
+            <div id="scoreRing" class="score-ring" style="--score:0">
+              <div class="score-inner">
+                <div id="score" class="score">—</div>
+                <div id="scoreCaption" class="score-caption">readiness</div>
+              </div>
+            </div>
+            <div id="breakdown" class="breakdown"></div>
+          </div>
+
+          <h3 id="feedbackTitle">Coach feedback</h3>
+          <div id="feedback" class="result-box"></div>
+
+          <h3 id="improvedTitle">Stronger answer structure</h3>
+          <div id="improved" class="result-box"></div>
+
+          <div id="tip" class="tip"><span>💡</span><span id="tipText"></span></div>
+
+          <div class="actions">
+            <button class="btn btn-success" id="copyBtn" type="button">Copy stronger answer</button>
+            <button class="btn btn-secondary" id="anotherBtn" type="button">Practise another question</button>
+            <button class="btn btn-ghost" id="restartBtn" type="button">Start over</button>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side">
+        <div class="side-card">
+          <h3 id="howTitle" class="side-title">How it works</h3>
+          <div class="how-item"><b>1</b><span id="how1">Enter a thesis topic or paste a short abstract.</span></div>
+          <div class="how-item"><b>2</b><span id="how2">Get five varied mock-panel questions.</span></div>
+          <div class="how-item"><b>3</b><span id="how3">Answer one and receive structured coaching.</span></div>
+          <span id="demoBadge" class="mini-badge">Demo mode · no API key needed</span>
+        </div>
+        <div class="side-card">
+          <h3 id="whyTitle" class="side-title">Built for access</h3>
+          <div class="privacy"><span>🌍</span><span id="whyText">Lightweight browser experience with local-language support for students who may not have regular access to mock defence coaching.</span></div>
+          <div class="privacy" style="margin-top:12px"><span>💾</span><span id="draftText">Your draft is saved only in this browser so an accidental refresh does not erase your work.</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <footer id="footerText">TNGIMPACT AI Challenge 2026 · AI for Education · Minimal public hackathon build</footer>
   </main>
 
   <script>
     const $ = (id) => document.getElementById(id);
     let questions = [];
+    let selectedQuestionIndex = 0;
 
-    const translations = {
+    const examples = {
       en: {
-        heroText: 'Practice a thesis or final-year project defence. Generate examiner-style questions, answer one, and receive immediate structured feedback.',
-        languageLabel: 'Language',
-        badge: 'TNGIMPACT AI Challenge 2026 · Demo-ready',
-        step1Title: '1. Describe your research',
-        topicLabel: 'Thesis topic',
-        topicPlaceholder: 'e.g. Using AI to improve crop disease detection',
-        abstractLabel: 'Short abstract',
-        abstractPlaceholder: 'Describe the problem, method, results, and significance...',
-        generateBtn: 'Generate 5 defence questions',
-        step2Title: '2. Examiner questions',
-        chooseQuestionLabel: 'Choose a question to answer',
-        answerLabel: 'Your answer',
-        answerPlaceholder: 'Answer as if you were speaking to the defence panel...',
-        evaluateBtn: 'Evaluate my answer',
-        step3Title: '3. Feedback',
-        scoreLabel: 'Defence readiness score',
-        feedbackTitle: 'Coach feedback',
-        improvedTitle: 'Stronger answer structure',
-        footerText: 'Minimal hackathon MVP · No account required · Demo mode works without an API key',
-        validationResearch: 'Add a topic and an abstract of at least 20 characters.',
-        validationAnswer: 'Write an answer first.',
-        requestFailed: 'Request failed'
+        topic: 'AI-assisted crop disease detection for smallholder farmers',
+        abstract: 'This project explores a lightweight image-based AI tool that helps smallholder farmers identify common crop diseases earlier. The goal is to make basic guidance more accessible in communities where agricultural extension support may be limited, while keeping the system simple enough for low-cost devices and constrained connectivity.',
+        answer: 'The project addresses delayed identification of crop disease. Smallholder farmers can lose part of a harvest before they receive specialist advice, so the system provides an earlier indication from a crop image. The main benefit is faster action, while the tool is designed to support rather than replace agricultural experts.'
       },
       ha: {
-        heroText: 'Yi atisayen kare kundin digiri ko aikin karshe. Samu tambayoyin masu jarrabawa, ka amsa daya, sannan ka samu shawara nan take.',
-        languageLabel: 'Harshe',
-        badge: 'TNGIMPACT AI Challenge 2026 · Shirye don demo',
-        step1Title: '1. Bayyana bincikenka',
-        topicLabel: 'Taken bincike',
-        topicPlaceholder: 'Misali: Amfani da AI wajen gano cututtukan amfanin gona',
-        abstractLabel: 'Takaitaccen bayani',
-        abstractPlaceholder: 'Bayyana matsala, hanya, sakamako da muhimmancin binciken...',
-        generateBtn: 'Samar da tambayoyi 5 na kare bincike',
-        step2Title: '2. Tambayoyin masu jarrabawa',
-        chooseQuestionLabel: 'Zabi tambayar da za ka amsa',
-        answerLabel: 'Amsarka',
-        answerPlaceholder: 'Amsa kamar kana magana da kwamitin kare bincike...',
-        evaluateBtn: 'Auna amsata',
-        step3Title: '3. Shawara',
-        scoreLabel: 'Makin shirye-shiryen kare bincike',
-        feedbackTitle: 'Shawarar mai horarwa',
-        improvedTitle: 'Tsarin amsa mafi karfi',
-        footerText: 'Karamin MVP na hackathon · Ba a bukatar asusu · Demo mode yana aiki ba tare da API key ba',
-        validationResearch: 'Saka taken bincike da takaitaccen bayani mai akalla haruffa 20.',
-        validationAnswer: 'Rubuta amsa da farko.',
-        requestFailed: 'An samu matsala wajen aika bukata'
+        topic: 'Amfani da AI wajen gano cututtukan amfanin gona ga kananan manoma',
+        abstract: 'Wannan aikin yana nazarin wata hanya mai sauki ta AI da ke amfani da hoton amfanin gona domin taimaka wa kananan manoma su gano wasu cututtuka da wuri. Manufar ita ce samar da taimako cikin sauki a wuraren da samun kwararren jamiin noma yake da wahala, tare da kiyaye tsarin ya dace da wayoyi masu araha da karancin intanet.',
+        answer: 'Aikin yana magance jinkirin gano cututtukan amfanin gona. Wani lokaci manomi yana iya rasa amfanin gona kafin ya samu shawarar kwararre, don haka tsarin yana taimakawa wajen bayar da alamar farko daga hoto. Manufar ita ce a dauki mataki da wuri ba tare da maye gurbin kwararrun noma ba.'
       }
     };
 
-    function currentLanguage() {
-      return $('language').value;
-    }
+    const translations = {
+      en: {
+        eyebrow: 'AI for Education · Africa', heroText: 'Practice your thesis defence with examiner-style questions and instant structured feedback — in English or Hausa.',
+        languageLabel: 'Language', pillFast: 'Instant practice', pillLocal: 'English + Hausa', pillPrivacy: 'No account required',
+        step1Title: 'Add your research', step1Sub: 'A topic is enough to start. Adding an abstract gives the coach more context.', topicLabel: 'Thesis topic', topicHint: 'required', topicPlaceholder: 'e.g. Using AI to improve crop disease detection',
+        abstractLabel: 'Abstract / project summary', abstractHint: 'optional', abstractPlaceholder: 'Paste your abstract, or leave this empty and start with the topic only.', exampleBtn: '✨ Use example', generateBtn: 'Generate 5 defence questions →', clearBtn: 'Clear',
+        step2Title: 'Choose an examiner question', step2Sub: 'Pick any question below. You can return and practise the others without regenerating.', answerLabel: 'Your spoken-style answer', answerHint: 'short is fine', answerPlaceholder: 'Answer naturally, as if you were speaking to your defence panel...', sampleAnswerBtn: 'Use sample answer', evaluateBtn: 'Evaluate my answer →',
+        step3Title: 'Your defence feedback', step3Sub: 'A quick readiness snapshot, not an academic grade.', scoreCaption: 'readiness', feedbackTitle: 'Coach feedback', improvedTitle: 'Stronger answer structure', copyBtn: 'Copy stronger answer', anotherBtn: 'Practise another question', restartBtn: 'Start over',
+        howTitle: 'How it works', how1: 'Enter a thesis topic or paste a short abstract.', how2: 'Get five varied mock-panel questions.', how3: 'Answer one and receive structured coaching.', demoBadge: 'Demo mode · no API key needed', whyTitle: 'Built for access', whyText: 'Lightweight browser experience with local-language support for students who may not have regular access to mock defence coaching.', draftText: 'Your draft is saved only in this browser so an accidental refresh does not erase your work.', footerText: 'TNGIMPACT AI Challenge 2026 · AI for Education · Minimal public hackathon build',
+        topicRequired: 'Add a thesis topic first.', answerRequired: 'Write an answer first.', generating: 'Preparing your mock defence panel…', evaluating: 'Reviewing your answer…', requestFailed: 'Something went wrong. Please try again.', exampleLoaded: 'Example loaded — you can edit it or generate questions now.', copied: 'Copied!', clarity: 'Clarity', relevance: 'Relevance', evidence: 'Evidence', confidence: 'Confidence'
+      },
+      ha: {
+        eyebrow: 'AI don Ilimi · Afirka', heroText: 'Yi atisayen kare bincikenka da tambayoyin masu jarrabawa da shawara nan take — cikin Turanci ko Hausa.',
+        languageLabel: 'Harshe', pillFast: 'Atisaye nan take', pillLocal: 'Turanci + Hausa', pillPrivacy: 'Ba a bukatar asusu',
+        step1Title: 'Saka bayanin bincikenka', step1Sub: 'Taken bincike kadai ya isa don farawa. Takaitaccen bayani zai ba mai horarwa karin fahimta.', topicLabel: 'Taken bincike', topicHint: 'dole', topicPlaceholder: 'Misali: Amfani da AI wajen gano cututtukan amfanin gona',
+        abstractLabel: 'Takaitaccen bayani / bayanin aikin', abstractHint: 'na zabi ne', abstractPlaceholder: 'Manna takaitaccen bayani, ko ka bar shi babu komai ka fara da taken bincike.', exampleBtn: '✨ Yi amfani da misali', generateBtn: 'Samar da tambayoyi 5 →', clearBtn: 'Goge',
+        step2Title: 'Zabi tambayar mai jarrabawa', step2Sub: 'Zabi kowace tambaya. Za ka iya komawa ka yi atisayen sauran ba tare da sake samar da su ba.', answerLabel: 'Amsarka kamar magana', answerHint: 'gajeriyar amsa ta yi', answerPlaceholder: 'Amsa a dabiance kamar kana magana da kwamitin kare bincike...', sampleAnswerBtn: 'Yi amfani da amsar misali', evaluateBtn: 'Auna amsata →',
+        step3Title: 'Shawarar kare bincike', step3Sub: 'Wannan kimar shirye-shirye ce kawai, ba makin makaranta ba.', scoreCaption: 'shirye-shirye', feedbackTitle: 'Shawarar mai horarwa', improvedTitle: 'Tsarin amsa mafi karfi', copyBtn: 'Kwafi amsar da aka inganta', anotherBtn: 'Yi wata tambaya', restartBtn: 'Fara daga farko',
+        howTitle: 'Yadda yake aiki', how1: 'Saka taken bincike ko manna takaitaccen bayani.', how2: 'Samu tambayoyi biyar daban-daban na kwamitin gwaji.', how3: 'Amsa daya ka samu shawara mai tsari.', demoBadge: 'Demo mode · ba a bukatar API key', whyTitle: 'An gina shi don saukin amfani', whyText: 'Karamar manhajar yanar gizo mai tallafin harshen gida ga daliban da ba sa samun damar yin atisayen kare bincike akai-akai.', draftText: 'Ana ajiye rubutunka ne kawai a wannan browser domin refresh kada ya goge aikinka.', footerText: 'TNGIMPACT AI Challenge 2026 · AI don Ilimi · Karamin aikin hackathon na jama’a',
+        topicRequired: 'Saka taken bincike da farko.', answerRequired: 'Rubuta amsa da farko.', generating: 'Ana shirya kwamitin gwajin kare bincike…', evaluating: 'Ana duba amsarka…', requestFailed: 'An samu matsala. Sake gwadawa.', exampleLoaded: 'An saka misali — za ka iya gyara shi ko ka samar da tambayoyi yanzu.', copied: 'An kwafa!', clarity: 'Bayyanawa', relevance: 'Dacewa', evidence: 'Shaida', confidence: 'Kwarin gwiwa'
+      }
+    };
+
+    function lang() { return $('language').value; }
+    function t() { return translations[lang()]; }
 
     function applyLanguage() {
-      const lang = currentLanguage();
-      const t = translations[lang];
-      document.documentElement.lang = lang;
-      $('heroText').textContent = t.heroText;
-      $('languageLabel').textContent = t.languageLabel;
-      $('badge').textContent = t.badge;
-      $('step1Title').textContent = t.step1Title;
-      $('topicLabel').textContent = t.topicLabel;
-      $('topic').placeholder = t.topicPlaceholder;
-      $('abstractLabel').textContent = t.abstractLabel;
-      $('abstract').placeholder = t.abstractPlaceholder;
-      $('generateBtn').textContent = t.generateBtn;
-      $('step2Title').textContent = t.step2Title;
-      $('chooseQuestionLabel').textContent = t.chooseQuestionLabel;
-      $('answerLabel').textContent = t.answerLabel;
-      $('answer').placeholder = t.answerPlaceholder;
-      $('evaluateBtn').textContent = t.evaluateBtn;
-      $('step3Title').textContent = t.step3Title;
-      $('scoreLabel').textContent = t.scoreLabel;
-      $('feedbackTitle').textContent = t.feedbackTitle;
-      $('improvedTitle').textContent = t.improvedTitle;
-      $('footerText').textContent = t.footerText;
-      questions = [];
-      $('questionsCard').classList.add('hidden');
-      $('resultCard').classList.add('hidden');
-      $('generateError').textContent = '';
-      $('evaluateError').textContent = '';
+      const x = t();
+      document.documentElement.lang = lang();
+      const textIds = ['eyebrow','heroText','languageLabel','pillFast','pillLocal','pillPrivacy','step1Title','step1Sub','topicLabel','topicHint','abstractLabel','abstractHint','exampleBtn','generateBtn','clearBtn','step2Title','step2Sub','answerLabel','answerHint','sampleAnswerBtn','evaluateBtn','step3Title','step3Sub','scoreCaption','feedbackTitle','improvedTitle','copyBtn','anotherBtn','restartBtn','howTitle','how1','how2','how3','demoBadge','whyTitle','whyText','draftText','footerText'];
+      textIds.forEach(id => { if ($(id)) $(id).textContent = x[id]; });
+      $('topic').placeholder = x.topicPlaceholder;
+      $('abstract').placeholder = x.abstractPlaceholder;
+      $('answer').placeholder = x.answerPlaceholder;
+      renderQuestions();
+      const currentResult = !$('resultCard').classList.contains('hidden');
+      if (currentResult) $('resultCard').classList.add('hidden');
+      saveDraft();
+    }
+
+    function saveDraft() {
+      try {
+        localStorage.setItem('defenceCoachDraft', JSON.stringify({ language: lang(), topic: $('topic').value, abstract: $('abstract').value, answer: $('answer').value }));
+      } catch (_) {}
+    }
+
+    function restoreDraft() {
+      try {
+        const raw = localStorage.getItem('defenceCoachDraft');
+        if (!raw) return;
+        const draft = JSON.parse(raw);
+        if (draft.language === 'en' || draft.language === 'ha') $('language').value = draft.language;
+        $('topic').value = draft.topic || '';
+        $('abstract').value = draft.abstract || '';
+        $('answer').value = draft.answer || '';
+      } catch (_) {}
     }
 
     async function postJSON(url, body) {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || translations[currentLanguage()].requestFailed);
+      const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      let data = {};
+      try { data = await response.json(); } catch (_) {}
+      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : t().requestFailed);
       return data;
     }
 
+    function renderQuestions() {
+      const list = $('questionList');
+      if (!questions.length) { list.innerHTML = ''; return; }
+      list.innerHTML = questions.map((q, i) => `
+        <button class="question-card ${i === selectedQuestionIndex ? 'active' : ''}" type="button" data-index="${i}" role="listitem" aria-pressed="${i === selectedQuestionIndex}">
+          <span class="qnum">${i + 1}</span><span>${escapeHtml(q)}</span>
+        </button>`).join('');
+      list.querySelectorAll('.question-card').forEach(btn => btn.addEventListener('click', () => {
+        selectedQuestionIndex = Number(btn.dataset.index);
+        renderQuestions();
+        $('answer').focus();
+      }));
+    }
+
+    function renderBreakdown(dimensions) {
+      const labels = { clarity: t().clarity, relevance: t().relevance, evidence: t().evidence, confidence: t().confidence };
+      $('breakdown').innerHTML = ['clarity','relevance','evidence','confidence'].map(key => {
+        const value = Number(dimensions?.[key] ?? 0);
+        return `<div class="metric-row"><span>${escapeHtml(labels[key])}</span><div class="bar"><span style="width:${Math.max(0, Math.min(100, value))}%"></span></div><strong>${value}</strong></div>`;
+      }).join('');
+    }
+
     $('language').addEventListener('change', applyLanguage);
+    ['topic','abstract','answer'].forEach(id => $(id).addEventListener('input', saveDraft));
+
+    $('exampleBtn').addEventListener('click', () => {
+      const sample = examples[lang()];
+      $('topic').value = sample.topic;
+      $('abstract').value = sample.abstract;
+      $('answer').value = '';
+      $('generateError').textContent = '';
+      $('generateStatus').textContent = t().exampleLoaded;
+      questions = [];
+      $('questionsCard').classList.add('hidden');
+      $('resultCard').classList.add('hidden');
+      saveDraft();
+    });
+
+    $('clearBtn').addEventListener('click', () => {
+      $('topic').value = '';
+      $('abstract').value = '';
+      $('answer').value = '';
+      questions = [];
+      selectedQuestionIndex = 0;
+      $('questionsCard').classList.add('hidden');
+      $('resultCard').classList.add('hidden');
+      $('generateStatus').textContent = '';
+      $('generateError').textContent = '';
+      try { localStorage.removeItem('defenceCoachDraft'); } catch (_) {}
+      $('topic').focus();
+    });
 
     $('generateBtn').addEventListener('click', async () => {
       $('generateError').textContent = '';
+      $('generateStatus').textContent = '';
       const topic = $('topic').value.trim();
       const abstract = $('abstract').value.trim();
-      const language = currentLanguage();
-      if (topic.length < 3 || abstract.length < 20) {
-        $('generateError').textContent = translations[language].validationResearch;
-        return;
-      }
+      if (!topic) { $('generateError').textContent = t().topicRequired; $('topic').focus(); return; }
+
       $('generateBtn').disabled = true;
+      $('generateStatus').textContent = t().generating;
       try {
-        const data = await postJSON('/api/questions', { topic, abstract, language });
+        const data = await postJSON('/api/questions', { topic, abstract, language: lang() });
         questions = data.questions;
-        $('questionList').innerHTML = questions.map(q => `<li>${escapeHtml(q)}</li>`).join('');
-        $('questionSelect').innerHTML = questions.map((q, i) => `<option value="${i}">${escapeHtml(q)}</option>`).join('');
+        selectedQuestionIndex = 0;
+        renderQuestions();
         $('questionsCard').classList.remove('hidden');
         $('resultCard').classList.add('hidden');
-        $('questionsCard').scrollIntoView({ behavior: 'smooth' });
+        $('generateStatus').textContent = '';
+        $('questionsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        saveDraft();
       } catch (err) {
-        $('generateError').textContent = err.message;
+        $('generateStatus').textContent = '';
+        $('generateError').textContent = err.message || t().requestFailed;
       } finally {
         $('generateBtn').disabled = false;
       }
     });
 
+    $('sampleAnswerBtn').addEventListener('click', () => {
+      $('answer').value = examples[lang()].answer;
+      $('evaluateError').textContent = '';
+      saveDraft();
+    });
+
     $('evaluateBtn').addEventListener('click', async () => {
       $('evaluateError').textContent = '';
+      $('evaluateStatus').textContent = '';
       const answer = $('answer').value.trim();
-      const language = currentLanguage();
-      if (answer.length < 2) {
-        $('evaluateError').textContent = translations[language].validationAnswer;
-        return;
-      }
-      const question = questions[Number($('questionSelect').value)];
+      if (!answer) { $('evaluateError').textContent = t().answerRequired; $('answer').focus(); return; }
+      if (!questions.length) return;
+
       $('evaluateBtn').disabled = true;
+      $('evaluateStatus').textContent = t().evaluating;
       try {
-        const data = await postJSON('/api/evaluate', {
-          topic: $('topic').value.trim(),
-          question,
-          answer,
-          language
-        });
-        $('score').textContent = `${data.score}/100`;
+        const data = await postJSON('/api/evaluate', { topic: $('topic').value.trim(), question: questions[selectedQuestionIndex], answer, language: lang() });
+        $('score').textContent = data.score;
+        $('scoreRing').style.setProperty('--score', data.score);
+        renderBreakdown(data.dimensions);
         $('feedback').textContent = data.feedback;
         $('improved').textContent = data.improved_answer;
+        $('tipText').textContent = data.next_tip || '';
         $('resultCard').classList.remove('hidden');
-        $('resultCard').scrollIntoView({ behavior: 'smooth' });
+        $('evaluateStatus').textContent = '';
+        $('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        saveDraft();
       } catch (err) {
-        $('evaluateError').textContent = err.message;
+        $('evaluateStatus').textContent = '';
+        $('evaluateError').textContent = err.message || t().requestFailed;
       } finally {
         $('evaluateBtn').disabled = false;
       }
     });
+
+    $('copyBtn').addEventListener('click', async () => {
+      const text = $('improved').textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = t().copyBtn;
+        $('copyBtn').textContent = t().copied;
+        setTimeout(() => { $('copyBtn').textContent = original; }, 1300);
+      } catch (_) {}
+    });
+
+    $('anotherBtn').addEventListener('click', () => {
+      $('resultCard').classList.add('hidden');
+      $('answer').value = '';
+      saveDraft();
+      $('questionsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('restartBtn').addEventListener('click', () => $('clearBtn').click());
 
     function escapeHtml(value) {
       const div = document.createElement('div');
@@ -250,6 +504,7 @@
       return div.innerHTML;
     }
 
+    restoreDraft();
     applyLanguage();
   </script>
 </body>
