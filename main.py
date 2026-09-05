@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
+from docx import Document
+from docx.opc.exceptions import PackageNotFoundError
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
@@ -16,11 +18,11 @@ from pypdf.errors import PdfReadError
 
 load_dotenv()
 
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 BASE_DIR = Path(__file__).resolve().parent
 INDEX_FILE = BASE_DIR / "index.html"
 STATIC_DIR = BASE_DIR / "static"
-MAX_UPLOAD_BYTES = 6 * 1024 * 1024
+MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 MAX_CONTEXT_CHARS = 12_000
 
 DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() in {"1", "true", "yes", "on"}
@@ -31,14 +33,7 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4.1-mini")
 
 Language = Literal["en", "ha", "yo", "ig", "sw", "zu"]
 SUPPORTED_LANGUAGES = ("en", "ha", "yo", "ig", "sw", "zu")
-LANGUAGE_NAMES = {
-    "en": "English",
-    "ha": "Hausa",
-    "yo": "Yorùbá",
-    "ig": "Igbo",
-    "sw": "Kiswahili",
-    "zu": "isiZulu",
-}
+LANGUAGE_NAMES = {"en": "English", "ha": "Hausa", "yo": "Yorùbá", "ig": "Igbo", "sw": "Kiswahili", "zu": "isiZulu"}
 
 LOCALES: dict[str, dict] = {
     "en": {
@@ -182,16 +177,16 @@ def score_dimensions(topic: str, question: str, answer: str, abstract: str = "")
     has_reasoning = any(marker in answer_lower for marker in REASONING_MARKERS)
     has_structure = any(marker in answer_lower for marker in STRUCTURE_MARKERS)
 
-    clarity = 48 + min(30, word_count) + min(10, sentence_count * 2)
+    clarity = 42 + min(34, word_count) + min(10, sentence_count * 2)
     if word_count > 180:
         clarity -= 10
-    relevance = 46 + min(36, question_overlap * 7) + min(10, word_count // 10)
-    evidence = 40 + min(16, word_count // 4) + (12 if has_reasoning else 0)
+    relevance = 36 + min(28, word_count) + min(30, question_overlap * 6)
+    evidence = 36 + min(20, word_count // 2) + (12 if has_reasoning else 0)
     if abstract:
-        evidence += min(22, context_overlap * 4) + min(8, shared_numbers * 4)
+        evidence += min(24, context_overlap * 4) + min(8, shared_numbers * 4)
     else:
         evidence += min(8, word_count // 12)
-    structure = 46 + min(20, word_count // 4) + (18 if has_structure else 0) + min(10, sentence_count * 2)
+    structure = 44 + min(20, word_count // 4) + (18 if has_structure else 0) + min(10, sentence_count * 2)
 
     return {
         "clarity": max(30, min(96, clarity)),
@@ -263,6 +258,28 @@ def suggested_topic_from_text(text: str) -> str:
     return ""
 
 
+def select_context(text: str) -> tuple[str, bool]:
+    text = text.strip()
+    if len(text) <= MAX_CONTEXT_CHARS:
+        return text, False
+    chunk = MAX_CONTEXT_CHARS // 3
+    middle = len(text) // 2
+    parts = [text[:chunk], text[max(0, middle - chunk // 2): middle + chunk // 2], text[-chunk:]]
+    sampled = "\n\n…\n\n".join(part.strip() for part in parts)
+    return sampled[:MAX_CONTEXT_CHARS], True
+
+
+def extract_docx_text(content: bytes) -> str:
+    document = Document(BytesIO(content))
+    blocks = [paragraph.text.strip() for paragraph in document.paragraphs if paragraph.text.strip()]
+    for table in document.tables:
+        for row in table.rows:
+            cells = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+            if cells:
+                blocks.append(" | ".join(cells))
+    return "\n".join(blocks)
+
+
 @app.middleware("http")
 async def add_security_headers(request, call_next):
     response = await call_next(request)
@@ -284,32 +301,33 @@ def home() -> HTMLResponse:
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "version": APP_VERSION, "mode": "demo" if DEMO_MODE else "llm", "fallback_to_demo": AI_FALLBACK_TO_DEMO, "languages": list(SUPPORTED_LANGUAGES), "upload_types": ["pdf", "txt", "md"], "research_aware_evaluation": True}
+    return {"status": "ok", "version": APP_VERSION, "mode": "demo" if DEMO_MODE else "llm", "fallback_to_demo": AI_FALLBACK_TO_DEMO, "languages": list(SUPPORTED_LANGUAGES), "upload_types": ["pdf", "docx", "txt", "md"], "research_aware_evaluation": True, "representative_context_sampling": True}
 
 
 @app.post("/api/extract")
 async def extract_research(file: UploadFile = File(...)) -> dict:
     filename = (file.filename or "research").strip()
     suffix = Path(filename).suffix.lower()
-    if suffix not in {".pdf", ".txt", ".md"}:
-        raise HTTPException(status_code=415, detail="Use a PDF, TXT, or Markdown file")
+    if suffix not in {".pdf", ".docx", ".txt", ".md"}:
+        raise HTTPException(status_code=415, detail="Use a PDF, DOCX, TXT, or Markdown file")
     content = await file.read(MAX_UPLOAD_BYTES + 1)
     if len(content) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="File is too large; maximum size is 6 MB")
+        raise HTTPException(status_code=413, detail="File is too large; maximum size is 12 MB")
     try:
         if suffix == ".pdf":
             reader = PdfReader(BytesIO(content))
             text = "\n\n".join((page.extract_text() or "").strip() for page in reader.pages)
+        elif suffix == ".docx":
+            text = extract_docx_text(content)
         else:
             text = content.decode("utf-8-sig")
-    except (PdfReadError, UnicodeDecodeError, ValueError) as exc:
+    except (PdfReadError, PackageNotFoundError, UnicodeDecodeError, ValueError, KeyError) as exc:
         raise HTTPException(status_code=422, detail="The file could not be read as text") from exc
     text = text.strip()
     if not text:
         raise HTTPException(status_code=422, detail="No extractable text was found in this file")
-    truncated = len(text) > MAX_CONTEXT_CHARS
-    context = text[:MAX_CONTEXT_CHARS]
-    return {"filename": filename, "text": context, "suggested_topic": suggested_topic_from_text(context), "truncated": truncated, "characters": len(context)}
+    context, truncated = select_context(text)
+    return {"filename": filename, "text": context, "suggested_topic": suggested_topic_from_text(text), "truncated": truncated, "characters": len(context)}
 
 
 @app.post("/api/questions")
