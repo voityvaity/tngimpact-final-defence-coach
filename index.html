@@ -10,8 +10,12 @@
     body { margin: 0; }
     .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 64px; }
     .hero { background: #111827; color: white; border-radius: 24px; padding: 32px; margin-bottom: 24px; }
+    .hero-top { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
     .hero h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 3.5rem); }
     .hero p { margin: 0; color: #d1d5db; max-width: 650px; line-height: 1.6; }
+    .language-box { min-width: 170px; }
+    .language-box label { margin-top: 0; color: #d1d5db; font-size: 13px; }
+    .language-box select { color: #111827; }
     .badge { display: inline-block; margin-top: 18px; background: #d1fae5; color: #065f46; padding: 7px 11px; border-radius: 999px; font-weight: 700; font-size: 13px; }
     .card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 24px; margin: 18px 0; box-shadow: 0 8px 30px rgba(17,24,39,.05); }
     h2 { margin-top: 0; }
@@ -32,50 +36,146 @@
 <body>
   <main class="wrap">
     <section class="hero">
-      <h1>Final Defence Coach</h1>
-      <p>Practice a thesis or final-year project defence. Generate examiner-style questions, answer one, and receive immediate structured feedback.</p>
-      <span class="badge">TNGIMPACT AI Challenge 2026 · Demo-ready</span>
+      <div class="hero-top">
+        <div>
+          <h1>Final Defence Coach</h1>
+          <p id="heroText">Practice a thesis or final-year project defence. Generate examiner-style questions, answer one, and receive immediate structured feedback.</p>
+        </div>
+        <div class="language-box">
+          <label id="languageLabel" for="language">Language</label>
+          <select id="language">
+            <option value="en">English</option>
+            <option value="ha">Hausa</option>
+          </select>
+        </div>
+      </div>
+      <span id="badge" class="badge">TNGIMPACT AI Challenge 2026 · Demo-ready</span>
     </section>
 
     <section class="card">
-      <h2>1. Describe your research</h2>
-      <label for="topic">Thesis topic</label>
+      <h2 id="step1Title">1. Describe your research</h2>
+      <label id="topicLabel" for="topic">Thesis topic</label>
       <input id="topic" maxlength="300" placeholder="e.g. Using AI to improve crop disease detection" />
 
-      <label for="abstract">Short abstract</label>
+      <label id="abstractLabel" for="abstract">Short abstract</label>
       <textarea id="abstract" maxlength="8000" placeholder="Describe the problem, method, results, and significance..."></textarea>
       <button id="generateBtn">Generate 5 defence questions</button>
       <div id="generateError" class="error"></div>
     </section>
 
     <section id="questionsCard" class="card hidden">
-      <h2>2. Examiner questions</h2>
+      <h2 id="step2Title">2. Examiner questions</h2>
       <ol id="questionList" class="questions"></ol>
-      <label for="questionSelect">Choose a question to answer</label>
+      <label id="chooseQuestionLabel" for="questionSelect">Choose a question to answer</label>
       <select id="questionSelect"></select>
 
-      <label for="answer">Your answer</label>
+      <label id="answerLabel" for="answer">Your answer</label>
       <textarea id="answer" maxlength="5000" placeholder="Answer as if you were speaking to the defence panel..."></textarea>
       <button id="evaluateBtn">Evaluate my answer</button>
       <div id="evaluateError" class="error"></div>
     </section>
 
     <section id="resultCard" class="card hidden">
-      <h2>3. Feedback</h2>
-      <div class="muted">Defence readiness score</div>
+      <h2 id="step3Title">3. Feedback</h2>
+      <div id="scoreLabel" class="muted">Defence readiness score</div>
       <div id="score" class="score">—</div>
-      <h3>Coach feedback</h3>
+      <h3 id="feedbackTitle">Coach feedback</h3>
       <div id="feedback" class="result-box"></div>
-      <h3>Stronger answer structure</h3>
+      <h3 id="improvedTitle">Stronger answer structure</h3>
       <div id="improved" class="result-box"></div>
     </section>
 
-    <footer>Minimal hackathon MVP · No account required · Demo mode works without an API key</footer>
+    <footer id="footerText">Minimal hackathon MVP · No account required · Demo mode works without an API key</footer>
   </main>
 
   <script>
     const $ = (id) => document.getElementById(id);
     let questions = [];
+
+    const translations = {
+      en: {
+        heroText: 'Practice a thesis or final-year project defence. Generate examiner-style questions, answer one, and receive immediate structured feedback.',
+        languageLabel: 'Language',
+        badge: 'TNGIMPACT AI Challenge 2026 · Demo-ready',
+        step1Title: '1. Describe your research',
+        topicLabel: 'Thesis topic',
+        topicPlaceholder: 'e.g. Using AI to improve crop disease detection',
+        abstractLabel: 'Short abstract',
+        abstractPlaceholder: 'Describe the problem, method, results, and significance...',
+        generateBtn: 'Generate 5 defence questions',
+        step2Title: '2. Examiner questions',
+        chooseQuestionLabel: 'Choose a question to answer',
+        answerLabel: 'Your answer',
+        answerPlaceholder: 'Answer as if you were speaking to the defence panel...',
+        evaluateBtn: 'Evaluate my answer',
+        step3Title: '3. Feedback',
+        scoreLabel: 'Defence readiness score',
+        feedbackTitle: 'Coach feedback',
+        improvedTitle: 'Stronger answer structure',
+        footerText: 'Minimal hackathon MVP · No account required · Demo mode works without an API key',
+        validationResearch: 'Add a topic and an abstract of at least 20 characters.',
+        validationAnswer: 'Write an answer first.',
+        requestFailed: 'Request failed'
+      },
+      ha: {
+        heroText: 'Yi atisayen kare kundin digiri ko aikin karshe. Samu tambayoyin masu jarrabawa, ka amsa daya, sannan ka samu shawara nan take.',
+        languageLabel: 'Harshe',
+        badge: 'TNGIMPACT AI Challenge 2026 · Shirye don demo',
+        step1Title: '1. Bayyana bincikenka',
+        topicLabel: 'Taken bincike',
+        topicPlaceholder: 'Misali: Amfani da AI wajen gano cututtukan amfanin gona',
+        abstractLabel: 'Takaitaccen bayani',
+        abstractPlaceholder: 'Bayyana matsala, hanya, sakamako da muhimmancin binciken...',
+        generateBtn: 'Samar da tambayoyi 5 na kare bincike',
+        step2Title: '2. Tambayoyin masu jarrabawa',
+        chooseQuestionLabel: 'Zabi tambayar da za ka amsa',
+        answerLabel: 'Amsarka',
+        answerPlaceholder: 'Amsa kamar kana magana da kwamitin kare bincike...',
+        evaluateBtn: 'Auna amsata',
+        step3Title: '3. Shawara',
+        scoreLabel: 'Makin shirye-shiryen kare bincike',
+        feedbackTitle: 'Shawarar mai horarwa',
+        improvedTitle: 'Tsarin amsa mafi karfi',
+        footerText: 'Karamin MVP na hackathon · Ba a bukatar asusu · Demo mode yana aiki ba tare da API key ba',
+        validationResearch: 'Saka taken bincike da takaitaccen bayani mai akalla haruffa 20.',
+        validationAnswer: 'Rubuta amsa da farko.',
+        requestFailed: 'An samu matsala wajen aika bukata'
+      }
+    };
+
+    function currentLanguage() {
+      return $('language').value;
+    }
+
+    function applyLanguage() {
+      const lang = currentLanguage();
+      const t = translations[lang];
+      document.documentElement.lang = lang;
+      $('heroText').textContent = t.heroText;
+      $('languageLabel').textContent = t.languageLabel;
+      $('badge').textContent = t.badge;
+      $('step1Title').textContent = t.step1Title;
+      $('topicLabel').textContent = t.topicLabel;
+      $('topic').placeholder = t.topicPlaceholder;
+      $('abstractLabel').textContent = t.abstractLabel;
+      $('abstract').placeholder = t.abstractPlaceholder;
+      $('generateBtn').textContent = t.generateBtn;
+      $('step2Title').textContent = t.step2Title;
+      $('chooseQuestionLabel').textContent = t.chooseQuestionLabel;
+      $('answerLabel').textContent = t.answerLabel;
+      $('answer').placeholder = t.answerPlaceholder;
+      $('evaluateBtn').textContent = t.evaluateBtn;
+      $('step3Title').textContent = t.step3Title;
+      $('scoreLabel').textContent = t.scoreLabel;
+      $('feedbackTitle').textContent = t.feedbackTitle;
+      $('improvedTitle').textContent = t.improvedTitle;
+      $('footerText').textContent = t.footerText;
+      questions = [];
+      $('questionsCard').classList.add('hidden');
+      $('resultCard').classList.add('hidden');
+      $('generateError').textContent = '';
+      $('evaluateError').textContent = '';
+    }
 
     async function postJSON(url, body) {
       const response = await fetch(url, {
@@ -84,21 +184,24 @@
         body: JSON.stringify(body)
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || 'Request failed');
+      if (!response.ok) throw new Error(data.detail || translations[currentLanguage()].requestFailed);
       return data;
     }
+
+    $('language').addEventListener('change', applyLanguage);
 
     $('generateBtn').addEventListener('click', async () => {
       $('generateError').textContent = '';
       const topic = $('topic').value.trim();
       const abstract = $('abstract').value.trim();
+      const language = currentLanguage();
       if (topic.length < 3 || abstract.length < 20) {
-        $('generateError').textContent = 'Add a topic and an abstract of at least 20 characters.';
+        $('generateError').textContent = translations[language].validationResearch;
         return;
       }
       $('generateBtn').disabled = true;
       try {
-        const data = await postJSON('/api/questions', { topic, abstract });
+        const data = await postJSON('/api/questions', { topic, abstract, language });
         questions = data.questions;
         $('questionList').innerHTML = questions.map(q => `<li>${escapeHtml(q)}</li>`).join('');
         $('questionSelect').innerHTML = questions.map((q, i) => `<option value="${i}">${escapeHtml(q)}</option>`).join('');
@@ -115,8 +218,9 @@
     $('evaluateBtn').addEventListener('click', async () => {
       $('evaluateError').textContent = '';
       const answer = $('answer').value.trim();
+      const language = currentLanguage();
       if (answer.length < 2) {
-        $('evaluateError').textContent = 'Write an answer first.';
+        $('evaluateError').textContent = translations[language].validationAnswer;
         return;
       }
       const question = questions[Number($('questionSelect').value)];
@@ -125,7 +229,8 @@
         const data = await postJSON('/api/evaluate', {
           topic: $('topic').value.trim(),
           question,
-          answer
+          answer,
+          language
         });
         $('score').textContent = `${data.score}/100`;
         $('feedback').textContent = data.feedback;
@@ -144,6 +249,8 @@
       div.textContent = value;
       return div.innerHTML;
     }
+
+    applyLanguage();
   </script>
 </body>
 </html>
