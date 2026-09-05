@@ -165,7 +165,7 @@ DEMO_MODE=true
 AI_FALLBACK_TO_DEMO=true
 ```
 
-Optional live AI:
+Generic OpenAI-compatible live AI:
 
 ```env
 DEMO_MODE=false
@@ -175,7 +175,21 @@ LLM_BASE_URL=https://api.example.com/v1
 LLM_MODEL=your-model-id
 ```
 
-Never commit `.env` or API keys.
+### CheapVibeCode / PromptPort preset
+
+The project can also use the OpenAI-compatible endpoint shown in the PromptPort/CheapVibeCode client instructions:
+
+```env
+DEMO_MODE=false
+AI_FALLBACK_TO_DEMO=true
+LLM_API_KEY=your_private_key_here
+LLM_BASE_URL=https://cheapvibecode.ru/v1
+LLM_MODEL=gpt-5.6-sol
+```
+
+Keep the real key only in the local `.env` file or in the deployment platform's secret/environment-variable settings. Never commit it to the repository.
+
+The application first tries JSON response mode because structured output is useful for the virtual panel and coaching. If a compatible provider rejects JSON mode, the backend automatically retries without `response_format`.
 
 ## API
 
