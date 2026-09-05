@@ -12,25 +12,32 @@ from main import app
 client = TestClient(app)
 
 
-def test_home_page():
+def test_home_page_has_bilingual_example_flow():
     response = client.get("/")
     assert response.status_code == 200
     assert "Final Defence Coach" in response.text
     assert '<option value="ha">Hausa</option>' in response.text
+    assert 'id="exampleBtn"' in response.text
+    assert 'id="sampleAnswerBtn"' in response.text
 
 
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "demo_mode": True, "languages": ["en", "ha"]}
+    assert response.json() == {
+        "status": "ok",
+        "demo_mode": True,
+        "languages": ["en", "ha"],
+        "version": "1.2.0",
+    }
 
 
-def test_generate_five_questions_in_english():
+def test_generate_five_questions_in_english_with_no_abstract():
     response = client.post(
         "/api/questions",
         json={
             "topic": "AI for crop disease detection",
-            "abstract": "This research explores a lightweight AI approach for detecting crop diseases from images in resource-constrained settings.",
+            "abstract": "",
             "language": "en",
         },
     )
@@ -42,12 +49,25 @@ def test_generate_five_questions_in_english():
     assert all(isinstance(question, str) and question for question in data["questions"])
 
 
+def test_short_abstract_is_allowed():
+    response = client.post(
+        "/api/questions",
+        json={
+            "topic": "Test topic",
+            "abstract": "short",
+            "language": "en",
+        },
+    )
+    assert response.status_code == 200
+    assert len(response.json()["questions"]) == 5
+
+
 def test_generate_five_questions_in_hausa():
     response = client.post(
         "/api/questions",
         json={
             "topic": "AI wajen gano cututtukan amfanin gona",
-            "abstract": "Wannan bincike yana amfani da AI mai sauki domin gano cututtukan amfanin gona daga hotuna a wuraren da kayan aiki suke da karanci.",
+            "abstract": "Wannan bincike yana amfani da AI domin taimaka wa kananan manoma.",
             "language": "ha",
         },
     )
@@ -59,13 +79,13 @@ def test_generate_five_questions_in_hausa():
     assert "Wace matsala" in data["questions"][0]
 
 
-def test_evaluate_answer_in_english():
+def test_evaluate_answer_returns_score_breakdown_in_english():
     response = client.post(
         "/api/evaluate",
         json={
             "topic": "AI for crop disease detection",
             "question": "What problem does your research solve?",
-            "answer": "The project helps identify crop disease earlier so farmers can respond faster and reduce avoidable crop losses.",
+            "answer": "The project helps identify crop disease earlier because farmers can act faster and reduce avoidable crop losses.",
             "language": "en",
         },
     )
@@ -74,8 +94,11 @@ def test_evaluate_answer_in_english():
     assert data["mode"] == "demo"
     assert data["language"] == "en"
     assert 0 <= data["score"] <= 100
+    assert set(data["dimensions"]) == {"clarity", "relevance", "evidence", "confidence"}
+    assert all(0 <= value <= 100 for value in data["dimensions"].values())
     assert data["feedback"]
     assert data["improved_answer"]
+    assert data["next_tip"]
 
 
 def test_evaluate_answer_in_hausa():
@@ -84,33 +107,32 @@ def test_evaluate_answer_in_hausa():
         json={
             "topic": "AI wajen gano cututtukan amfanin gona",
             "question": "Wace matsala bincikenka yake warwarewa?",
-            "answer": "Aikin yana taimakawa wajen gano cutar amfanin gona da wuri domin manoma su dauki mataki cikin sauri.",
+            "answer": "Aikin yana taimakawa wajen gano cutar amfanin gona da wuri saboda manoma su dauki mataki cikin sauri.",
             "language": "ha",
         },
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["mode"] == "demo"
     assert data["language"] == "ha"
-    assert 0 <= data["score"] <= 100
+    assert data["dimensions"]
     assert data["feedback"]
-    assert data["improved_answer"]
+    assert data["next_tip"]
 
 
-def test_validation_rejects_short_abstract():
+def test_blank_topic_is_rejected():
     response = client.post(
         "/api/questions",
-        json={"topic": "Test topic", "abstract": "too short", "language": "en"},
+        json={"topic": " ", "abstract": "Anything", "language": "en"},
     )
     assert response.status_code == 422
 
 
-def test_validation_rejects_unknown_language():
+def test_unknown_language_is_rejected():
     response = client.post(
         "/api/questions",
         json={
             "topic": "Test topic",
-            "abstract": "This abstract is definitely long enough to pass the minimum validation length.",
+            "abstract": "",
             "language": "xx",
         },
     )
