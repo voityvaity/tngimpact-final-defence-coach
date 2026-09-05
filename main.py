@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Literal
 
 import httpx
 from dotenv import load_dotenv
@@ -10,7 +11,7 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-app = FastAPI(title="Final Defence Coach", version="1.0.0")
+app = FastAPI(title="Final Defence Coach", version="1.1.0")
 BASE_DIR = Path(__file__).resolve().parent
 INDEX_FILE = BASE_DIR / "index.html"
 
@@ -19,19 +20,36 @@ LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/")
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4.1-mini")
 
+Language = Literal["en", "ha"]
+
 
 class ThesisInput(BaseModel):
     topic: str = Field(min_length=3, max_length=300)
     abstract: str = Field(min_length=20, max_length=8000)
+    language: Language = "en"
 
 
 class AnswerInput(BaseModel):
     topic: str = Field(min_length=3, max_length=300)
     question: str = Field(min_length=3, max_length=1000)
     answer: str = Field(min_length=2, max_length=5000)
+    language: Language = "en"
 
 
-def demo_questions(topic: str) -> list[str]:
+def language_name(language: Language) -> str:
+    return "Hausa" if language == "ha" else "English"
+
+
+def demo_questions(topic: str, language: Language) -> list[str]:
+    if language == "ha":
+        return [
+            f"Wace matsala bincikenka kan '{topic}' yake warwarewa, kuma me ya sa take da muhimmanci?",
+            "Wace hanyar bincike ka zaba, kuma me ya sa ta dace da wannan binciken?",
+            "Mene ne mafi muhimmancin sakamako ko fahimta daga aikinka?",
+            "Mene ne manyan iyakokin bincikenka?",
+            "Idan kana da karin lokaci ko kayan aiki, me za ka inganta ko bincika gaba?",
+        ]
+
     return [
         f"What problem does your research on '{topic}' solve, and why is it important?",
         "What methodology did you choose, and why was it appropriate for this study?",
@@ -42,29 +60,35 @@ def demo_questions(topic: str) -> list[str]:
 
 
 def demo_evaluation(payload: AnswerInput) -> dict:
-    words = payload.answer.split()
-    word_count = len(words)
+    word_count = len(payload.answer.split())
     score = min(92, 45 + min(35, word_count // 2))
 
-    strengths = "You answered the question directly"
-    if word_count >= 35:
-        strengths += " and provided useful detail"
+    if payload.language == "ha":
+        detail = " kuma ta bayar da cikakken bayani" if word_count >= 35 else ", amma amsar tana da gajarta"
+        feedback = (
+            f"Amsar ta shiga batun kai tsaye{detail}. Don karfafa amsar, fara da babban batu, "
+            "sannan ka kawo takamaiman shaida daga binciken, ka kuma bayyana dalilin muhimmancinta."
+        )
+        improved = (
+            f"Babban batu shi ne cewa wannan bincike kan {payload.topic} yana magance wata matsala da aka fayyace. "
+            f"A wajen amsa tambayar '{payload.question}', zan fara da muhimmin sakamako ko shawara, "
+            "sannan in goyi bayansa da shaida daga binciken, in bayyana dalili, kuma in ambaci wata iyaka idan ta dace. "
+            "Wannan yana sa amsar ta kasance a takaice, mai hujja, kuma tana da alaka da manufar binciken."
+        )
     else:
-        strengths += ", but the answer is quite short"
+        detail = " and provided useful detail" if word_count >= 35 else ", but the answer is quite short"
+        feedback = (
+            f"You answered the question directly{detail}. Make the response stronger by stating your main point first, "
+            "supporting it with one concrete detail from the research, and ending with the significance of that detail."
+        )
+        improved = (
+            f"My main point is that this work on {payload.topic} addresses a clearly defined research problem. "
+            f"In response to the question '{payload.question}', I would first state the key finding or decision, "
+            "then support it with evidence from the study, explain the reasoning behind it, and acknowledge any relevant limitation. "
+            "This makes the answer concise, defensible, and connected to the research objective."
+        )
 
-    feedback = (
-        f"{strengths}. Make the response stronger by stating your main point first, "
-        "supporting it with one concrete detail from the research, and ending with the significance of that detail."
-    )
-
-    improved = (
-        f"My main point is that this work on {payload.topic} addresses a clearly defined research problem. "
-        f"In response to the question '{payload.question}', I would first state the key finding or decision, "
-        "then support it with evidence from the study, explain the reasoning behind it, and acknowledge any relevant limitation. "
-        "This makes the answer concise, defensible, and connected to the research objective."
-    )
-
-    return {"score": score, "feedback": feedback, "improved_answer": improved, "mode": "demo"}
+    return {"score": score, "feedback": feedback, "improved_answer": improved, "mode": "demo", "language": payload.language}
 
 
 def extract_json(text: str) -> dict:
@@ -107,18 +131,22 @@ def home() -> HTMLResponse:
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "demo_mode": DEMO_MODE}
+    return {"status": "ok", "demo_mode": DEMO_MODE, "languages": ["en", "ha"]}
 
 
 @app.post("/api/questions")
 async def generate_questions(payload: ThesisInput) -> dict:
     if DEMO_MODE:
-        return {"questions": demo_questions(payload.topic), "mode": "demo"}
+        return {"questions": demo_questions(payload.topic, payload.language), "mode": "demo", "language": payload.language}
 
+    target_language = language_name(payload.language)
     result = await call_llm([
         {
             "role": "system",
-            "content": "You are a university thesis defence examiner. Return JSON only with a 'questions' array containing exactly five concise, challenging but fair questions.",
+            "content": (
+                "You are a university thesis defence examiner. Return JSON only with a 'questions' array containing exactly five "
+                f"concise, challenging but fair questions. Write every question in {target_language}."
+            ),
         },
         {
             "role": "user",
@@ -128,7 +156,7 @@ async def generate_questions(payload: ThesisInput) -> dict:
     questions = result.get("questions")
     if not isinstance(questions, list) or len(questions) != 5 or not all(isinstance(q, str) for q in questions):
         raise HTTPException(status_code=502, detail="LLM did not return exactly five questions")
-    return {"questions": questions, "mode": "llm"}
+    return {"questions": questions, "mode": "llm", "language": payload.language}
 
 
 @app.post("/api/evaluate")
@@ -136,10 +164,14 @@ async def evaluate_answer(payload: AnswerInput) -> dict:
     if DEMO_MODE:
         return demo_evaluation(payload)
 
+    target_language = language_name(payload.language)
     result = await call_llm([
         {
             "role": "system",
-            "content": "Evaluate a student's thesis defence answer. Return JSON only with integer 'score' from 0 to 100, short 'feedback', and 'improved_answer'. Be constructive and specific.",
+            "content": (
+                "Evaluate a student's thesis defence answer. Return JSON only with integer 'score' from 0 to 100, short 'feedback', "
+                f"and 'improved_answer'. Be constructive and specific. Write feedback and improved_answer in {target_language}."
+            ),
         },
         {
             "role": "user",
@@ -158,4 +190,5 @@ async def evaluate_answer(payload: AnswerInput) -> dict:
         "feedback": feedback,
         "improved_answer": improved_answer,
         "mode": "llm",
+        "language": payload.language,
     }
