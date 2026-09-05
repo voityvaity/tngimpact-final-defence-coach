@@ -19,16 +19,8 @@ jobs:
         run: python -m compileall -q main.py
       - name: Check browser JavaScript syntax
         run: |
-          python - <<'PY'
-          import re
-          from pathlib import Path
-          html = Path("index.html").read_text(encoding="utf-8")
-          match = re.search(r"<script>(.*)</script>", html, re.DOTALL)
-          if not match:
-              raise SystemExit("No application script found")
-          Path("/tmp/final-defence-coach.js").write_text(match.group(1), encoding="utf-8")
-          PY
-          node --check /tmp/final-defence-coach.js
+          node --check static/i18n.js
+          node --check static/app.js
       - name: Run tests
         env:
           DEMO_MODE: "true"
