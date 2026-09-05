@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Final Defence Coach</title>
+  <style>
+    :root { font-family: Inter, system-ui, sans-serif; color: #18212f; background: #f5f7fb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 64px; }
+    .hero { background: #111827; color: white; border-radius: 24px; padding: 32px; margin-bottom: 24px; }
+    .hero h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 3.5rem); }
+    .hero p { margin: 0; color: #d1d5db; max-width: 650px; line-height: 1.6; }
+    .badge { display: inline-block; margin-top: 18px; background: #d1fae5; color: #065f46; padding: 7px 11px; border-radius: 999px; font-weight: 700; font-size: 13px; }
+    .card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 24px; margin: 18px 0; box-shadow: 0 8px 30px rgba(17,24,39,.05); }
+    h2 { margin-top: 0; }
+    label { display: block; margin: 16px 0 7px; font-weight: 700; }
+    input, textarea, select { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 13px 14px; font: inherit; background: white; }
+    textarea { min-height: 140px; resize: vertical; }
+    button { border: 0; border-radius: 12px; padding: 13px 18px; font: inherit; font-weight: 800; cursor: pointer; background: #2563eb; color: white; margin-top: 16px; }
+    button:disabled { opacity: .55; cursor: wait; }
+    .muted { color: #64748b; }
+    .hidden { display: none; }
+    .questions { padding-left: 22px; line-height: 1.65; }
+    .score { font-size: 44px; font-weight: 900; margin: 4px 0; }
+    .result-box { background: #f8fafc; border-radius: 14px; padding: 16px; margin-top: 12px; white-space: pre-wrap; line-height: 1.55; }
+    .error { color: #b91c1c; margin-top: 12px; font-weight: 700; }
+    footer { text-align: center; color: #64748b; margin-top: 30px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Final Defence Coach</h1>
+      <p>Practice a thesis or final-year project defence. Generate examiner-style questions, answer one, and receive immediate structured feedback.</p>
+      <span class="badge">TNGIMPACT AI Challenge 2026 · Demo-ready</span>
+    </section>
+
+    <section class="card">
+      <h2>1. Describe your research</h2>
+      <label for="topic">Thesis topic</label>
+      <input id="topic" maxlength="300" placeholder="e.g. Using AI to improve crop disease detection" />
+
+      <label for="abstract">Short abstract</label>
+      <textarea id="abstract" maxlength="8000" placeholder="Describe the problem, method, results, and significance..."></textarea>
+      <button id="generateBtn">Generate 5 defence questions</button>
+      <div id="generateError" class="error"></div>
+    </section>
+
+    <section id="questionsCard" class="card hidden">
+      <h2>2. Examiner questions</h2>
+      <ol id="questionList" class="questions"></ol>
+      <label for="questionSelect">Choose a question to answer</label>
+      <select id="questionSelect"></select>
+
+      <label for="answer">Your answer</label>
+      <textarea id="answer" maxlength="5000" placeholder="Answer as if you were speaking to the defence panel..."></textarea>
+      <button id="evaluateBtn">Evaluate my answer</button>
+      <div id="evaluateError" class="error"></div>
+    </section>
+
+    <section id="resultCard" class="card hidden">
+      <h2>3. Feedback</h2>
+      <div class="muted">Defence readiness score</div>
+      <div id="score" class="score">—</div>
+      <h3>Coach feedback</h3>
+      <div id="feedback" class="result-box"></div>
+      <h3>Stronger answer structure</h3>
+      <div id="improved" class="result-box"></div>
+    </section>
+
+    <footer>Minimal hackathon MVP · No account required · Demo mode works without an API key</footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let questions = [];
+
+    async function postJSON(url, body) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Request failed');
+      return data;
+    }
+
+    $('generateBtn').addEventListener('click', async () => {
+      $('generateError').textContent = '';
+      const topic = $('topic').value.trim();
+      const abstract = $('abstract').value.trim();
+      if (topic.length < 3 || abstract.length < 20) {
+        $('generateError').textContent = 'Add a topic and an abstract of at least 20 characters.';
+        return;
+      }
+      $('generateBtn').disabled = true;
+      try {
+        const data = await postJSON('/api/questions', { topic, abstract });
+        questions = data.questions;
+        $('questionList').innerHTML = questions.map(q => `<li>${escapeHtml(q)}</li>`).join('');
+        $('questionSelect').innerHTML = questions.map((q, i) => `<option value="${i}">${escapeHtml(q)}</option>`).join('');
+        $('questionsCard').classList.remove('hidden');
+        $('resultCard').classList.add('hidden');
+        $('questionsCard').scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        $('generateError').textContent = err.message;
+      } finally {
+        $('generateBtn').disabled = false;
+      }
+    });
+
+    $('evaluateBtn').addEventListener('click', async () => {
+      $('evaluateError').textContent = '';
+      const answer = $('answer').value.trim();
+      if (answer.length < 2) {
+        $('evaluateError').textContent = 'Write an answer first.';
+        return;
+      }
+      const question = questions[Number($('questionSelect').value)];
+      $('evaluateBtn').disabled = true;
+      try {
+        const data = await postJSON('/api/evaluate', {
+          topic: $('topic').value.trim(),
+          question,
+          answer
+        });
+        $('score').textContent = `${data.score}/100`;
+        $('feedback').textContent = data.feedback;
+        $('improved').textContent = data.improved_answer;
+        $('resultCard').classList.remove('hidden');
+        $('resultCard').scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        $('evaluateError').textContent = err.message;
+      } finally {
+        $('evaluateBtn').disabled = false;
+      }
+    });
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
