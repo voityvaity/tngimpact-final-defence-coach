@@ -18,4 +18,5 @@ jobs:
       - name: Run tests
         env:
           DEMO_MODE: "true"
+          PYTHONPATH: "."
         run: pytest -q
