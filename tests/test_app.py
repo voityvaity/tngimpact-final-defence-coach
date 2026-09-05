@@ -38,7 +38,11 @@ def test_health_reports_runtime_capabilities():
 
 
 def test_api_response_has_security_headers():
-    response = client.get("/health")
+    response = client.post(
+        "/api/questions",
+        json={"topic": "Test topic", "abstract": "", "language": "en"},
+    )
+    assert response.status_code == 200
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["referrer-policy"] == "no-referrer"
     assert response.headers["cache-control"] == "no-store"
