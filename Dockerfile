@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --create-home --uid 10001 appuser
 
 COPY --chown=appuser:appuser main.py index.html ./
+COPY --chown=appuser:appuser static ./static
 
 USER appuser
 EXPOSE 8000
