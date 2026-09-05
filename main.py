@@ -262,11 +262,17 @@ def select_context(text: str) -> tuple[str, bool]:
     text = text.strip()
     if len(text) <= MAX_CONTEXT_CHARS:
         return text, False
-    chunk = MAX_CONTEXT_CHARS // 3
+    separator = "\n\n…\n\n"
+    available = MAX_CONTEXT_CHARS - 2 * len(separator)
+    head_size = available // 3
+    middle_size = available // 3
+    tail_size = available - head_size - middle_size
     middle = len(text) // 2
-    parts = [text[:chunk], text[max(0, middle - chunk // 2): middle + chunk // 2], text[-chunk:]]
-    sampled = "\n\n…\n\n".join(part.strip() for part in parts)
-    return sampled[:MAX_CONTEXT_CHARS], True
+    middle_start = max(0, middle - middle_size // 2)
+    middle_end = middle_start + middle_size
+    parts = [text[:head_size], text[middle_start:middle_end], text[-tail_size:]]
+    sampled = separator.join(part.strip() for part in parts)
+    return sampled, True
 
 
 def extract_docx_text(content: bytes) -> str:
