@@ -15,7 +15,7 @@ from pypdf.errors import PdfReadError
 
 load_dotenv()
 
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.1.0"
 BASE_DIR = Path(__file__).resolve().parent
 INDEX_FILE = BASE_DIR / "index.html"
 MAX_UPLOAD_BYTES = 6 * 1024 * 1024
@@ -28,7 +28,188 @@ LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/"
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4.1-mini")
 
 app = FastAPI(title="Final Defence Coach", version=APP_VERSION)
-Language = Literal["en", "ha"]
+Language = Literal["en", "ha", "yo", "ig", "sw", "zu"]
+SUPPORTED_LANGUAGES: tuple[str, ...] = ("en", "ha", "yo", "ig", "sw", "zu")
+
+LANGUAGE_NAMES: dict[str, str] = {
+    "en": "English",
+    "ha": "Hausa",
+    "yo": "Yorùbá",
+    "ig": "Igbo",
+    "sw": "Kiswahili",
+    "zu": "isiZulu",
+}
+
+LOCALES: dict[str, dict] = {
+    "en": {
+        "roles": [
+            ("Research supervisor", "Problem & impact"),
+            ("Methodology examiner", "Methodology"),
+            ("Evidence reviewer", "Results & evidence"),
+            ("External examiner", "Limitations"),
+            ("Impact reviewer", "Practical application"),
+        ],
+        "questions": [
+            "What problem does your research on '{topic}' solve, and who benefits most from the result?",
+            "Why did you choose this methodology, and what alternative approach did you consider but reject?",
+            "What is the most important result from your work, and what evidence best supports it?",
+            "What is the biggest limitation of your research, and how should that limitation affect interpretation of the results?",
+            "If you turned this research into a real-world solution, what would you do next and how would you measure success?",
+        ],
+        "labels": {"clarity": "clarity", "relevance": "relevance to the question", "evidence": "use of evidence", "structure": "answer structure"},
+        "strength": "Your strongest area in this response is {label}.",
+        "improvement": "Your biggest opportunity for the next answer is {label}.",
+        "tips": {
+            "clarity": "Lead with one sentence that directly answers the question before adding detail.",
+            "relevance": "Echo the key part of the examiner's question and connect every point back to it.",
+            "evidence": "Add one concrete result, number, example, or observation from your own research.",
+            "structure": "Use a simple structure: claim → evidence → significance → limitation.",
+        },
+        "feedback": "Your response was assessed for clarity, relevance, evidence, and structure. This score does not judge whether your research is scientifically correct; it reflects how defensible the written answer sounds to a panel.",
+        "framework": "A stronger answer structure you can fill with your real research:\n1. Main claim: [direct answer to the examiner's question].\n2. Evidence: [specific result, number, or observation from your study].\n3. Significance: [why that evidence matters].\n4. Limitation: [what the result cannot prove or where caution is needed].",
+        "fallback": "The AI provider was unavailable, so local demo coaching was used to keep the practice session working.",
+    },
+    "ha": {
+        "roles": [
+            ("Mai kula da bincike", "Matsala da tasiri"),
+            ("Mai nazarin hanya", "Hanyar bincike"),
+            ("Mai duba hujja", "Sakamako da hujja"),
+            ("Mai jarrabawa na waje", "Iyakoki"),
+            ("Mai duba tasiri", "Amfani a aikace"),
+        ],
+        "questions": [
+            "Wace matsala bincikenka kan '{topic}' yake warwarewa, kuma wa zai fi amfana da sakamakonsa?",
+            "Me ya sa ka zaɓi wannan hanyar bincike, kuma wace hanya ce ka yi la'akari da ita amma ba ka yi amfani da ita ba?",
+            "Mene ne mafi muhimmancin sakamako daga aikinka, kuma wace shaida ce ta fi goyon bayansa?",
+            "Mene ne babban iyakar bincikenka, kuma ta yaya wannan iyakar ke shafar fassarar sakamakon?",
+            "Idan za ka mayar da wannan bincike zuwa mafita ta zahiri, mene ne mataki na gaba kuma yaya za ka auna nasara?",
+        ],
+        "labels": {"clarity": "bayyananniyar amsa", "relevance": "dacewa da tambaya", "evidence": "amfani da hujja", "structure": "tsarin amsa"},
+        "strength": "Mafi ƙarfin ɓangaren amsarka shi ne {label}.",
+        "improvement": "Abin da ya fi dacewa ka inganta a amsa ta gaba shi ne {label}.",
+        "tips": {
+            "clarity": "Fara da jimla ɗaya da ke ba da amsa kai tsaye kafin ƙarin bayani.",
+            "relevance": "Maimaita muhimmin ɓangaren tambayar sannan ka danganta kowace hujja da shi.",
+            "evidence": "Ƙara sakamako, adadi, misali ko wata hujja takamaimai daga bincikenka.",
+            "structure": "Yi amfani da tsari mai sauƙi: batu → hujja → muhimmanci → iyaka.",
+        },
+        "feedback": "An auna amsarka ta fuskar bayyanawa, dacewa da tambaya, hujja, da tsari. Makin ba ya nuna ko bincikenka daidai ne; yana nuna yadda amsar ta kasance mai sauƙin karewa a gaban kwamitin.",
+        "framework": "Tsarin da za ka iya amfani da shi:\n1. Babban batu: [amsa kai tsaye ga tambayar].\n2. Hujja: [takamaiman sakamako, adadi ko misali daga bincikenka].\n3. Muhimmanci: [me wannan sakamakon yake nufi].\n4. Iyakar bincike: [abin da sakamakon ba zai iya tabbatarwa ba].",
+        "fallback": "Ba a samu AI provider ba, don haka an yi amfani da local demo coaching domin kada atisayen ya tsaya.",
+    },
+    "yo": {
+        "roles": [
+            ("Olùtọ́jú ìwádìí", "Ìṣòro àti ipa"),
+            ("Olùdánwò ọ̀nà ìwádìí", "Ọ̀nà ìwádìí"),
+            ("Olùṣàyẹ̀wò ẹ̀rí", "Àbájáde àti ẹ̀rí"),
+            ("Olùdánwò ita", "Ààlà ìwádìí"),
+            ("Olùṣàyẹ̀wò ipa", "Ìlò ní ayé gidi"),
+        ],
+        "questions": [
+            "Ìṣòro wo ni ìwádìí rẹ lórí '{topic}' ń yanjú, ta sì ni yóò jèrè jù lọ nínú àbájáde rẹ?",
+            "Kí ló dé tí o fi yan ọ̀nà ìwádìí yìí, ọ̀nà míì wo ni o sì ronú lé lórí ṣùgbọ́n tí o kò lò?",
+            "Kí ni àbájáde tó ṣe pàtàkì jù lọ nínú iṣẹ́ rẹ, ẹ̀rí wo sì ni ó ṣe atilẹyin rẹ jù lọ?",
+            "Kí ni ààlà pàtàkì jù lọ nínú ìwádìí rẹ, báwo ni ààlà náà ṣe yẹ kí ó ní ipa lórí ìtumọ̀ àbájáde?",
+            "Tí o bá fẹ́ yí ìwádìí yìí padà sí ojútùú gidi, kí ni ìgbésẹ̀ tó kàn, báwo ni o sì ṣe máa wọn àṣeyọrí?",
+        ],
+        "labels": {"clarity": "kíkedere", "relevance": "ìbáṣepọ̀ pẹ̀lú ìbéèrè", "evidence": "lílò ẹ̀rí", "structure": "ètò ìdáhùn"},
+        "strength": "Agbára tó ga jù lọ nínú ìdáhùn rẹ ni {label}.",
+        "improvement": "Ohun tó yẹ kí o dojú kọ jù lọ ní ìdáhùn tó kàn ni {label}.",
+        "tips": {
+            "clarity": "Bẹ̀rẹ̀ pẹ̀lú gbólóhùn kan tó dá ìbéèrè lóhùn taara kí o tó fi àlàyé kún un.",
+            "relevance": "Darukọ apá pàtàkì ìbéèrè náà lẹ́ẹ̀kan síi, kí gbogbo kókó rẹ sì padà sí i.",
+            "evidence": "Fi àbájáde kan, nọ́mbà, àpẹẹrẹ tàbí àkíyèsí gidi láti inú ìwádìí rẹ kún un.",
+            "structure": "Lo ètò tó rọrùn: ìdáhùn → ẹ̀rí → ìtumọ̀ → ààlà.",
+        },
+        "feedback": "A ṣe àyẹ̀wò ìdáhùn rẹ lórí kíkedere, ìbáṣepọ̀ pẹ̀lú ìbéèrè, ẹ̀rí àti ètò. Dimegilio yìí kì í sọ bóyá ìwádìí rẹ tọ́ nípa sáyẹ́ǹsì; ó ń fi hàn bí ìdáhùn rẹ ṣe rọrùn láti dáàbò bo níwájú igbimọ̀.",
+        "framework": "Ètò ìdáhùn tó lágbára tí o lè fi ìwádìí gidi rẹ kún:\n1. Kókó pàtàkì: [ìdáhùn taara sí ìbéèrè].\n2. Ẹ̀rí: [àbájáde, nọ́mbà tàbí àkíyèsí gidi].\n3. Ìtumọ̀: [ìdí tí ẹ̀rí náà fi ṣe pàtàkì].\n4. Ààlà: [ohun tí àbájáde kò lè fi hàn].",
+        "fallback": "Olùpèsè AI kò sí ní àkókò yìí, nítorí náà a lo demo coaching agbègbè kí ìdánwò rẹ má bà a dá dúró.",
+    },
+    "ig": {
+        "roles": [
+            ("Onye nlekọta nyocha", "Nsogbu na mmetụta"),
+            ("Onye nyocha usoro", "Usoro nyocha"),
+            ("Onye nyochaa ihe akaebe", "Nsonaazụ na ihe akaebe"),
+            ("Onye nyocha mpụga", "Oke nyocha"),
+            ("Onye nyochaa mmetụta", "Ojiji n'ezi ndụ"),
+        ],
+        "questions": [
+            "Kedu nsogbu nyocha gị gbasara '{topic}' na-edozi, onye kwa ga-erite uru kachasị na nsonaazụ ya?",
+            "Gịnị mere i ji họrọ usoro nyocha a, kedu ụzọ ọzọ i tụlere ma hapụ?",
+            "Kedu nsonaazụ kacha mkpa n'ọrụ gị, kedu ihe akaebe kacha akwado ya?",
+            "Kedu oke kachasị mkpa nke nyocha gị, olee otú oke ahụ kwesịrị isi metụta nkọwa nsonaazụ?",
+            "Ọ bụrụ na ị gbanwee nyocha a ka ọ bụrụ ngwọta n'ezi ndụ, gịnị bụ nzọụkwụ ọzọ, olee otú ị ga-esi tụọ ihe ịga nke ọma?",
+        ],
+        "labels": {"clarity": "ido anya", "relevance": "ịza ihe a jụrụ", "evidence": "iji ihe akaebe", "structure": "usoro azịza"},
+        "strength": "Akụkụ kacha sie ike n'azịza gị bụ {label}.",
+        "improvement": "Ihe kacha mkpa ị ga-emezi n'azịza ọzọ bụ {label}.",
+        "tips": {
+            "clarity": "Malite na otu ahịrịokwu na-aza ajụjụ ahụ ozugbo tupu ịgbakwunye nkọwa.",
+            "relevance": "Kpọghachi isi ihe dị n'ajụjụ ahụ ma jikọta isi okwu ọ bụla na ya.",
+            "evidence": "Tinye otu nsonaazụ, ọnụọgụ, ihe atụ ma ọ bụ nchọpụta kpọmkwem sitere na nyocha gị.",
+            "structure": "Jiri usoro dị mfe: nkwupụta → ihe akaebe → ihe ọ pụtara → oke.",
+        },
+        "feedback": "A tụlere azịza gị n'ido anya, ịdị mkpa, ihe akaebe na usoro. Akara a anaghị ekpebi ma nyocha gị ziri ezi n'ụzọ sayensị; ọ na-egosi otú azịza ederede si dị mfe ịgbachitere n'ihu ndị nyocha.",
+        "framework": "Usoro azịza ka mma ị nwere ike jupụta na nyocha gị n'ezie:\n1. Isi nkwupụta: [azịza ozugbo].\n2. Ihe akaebe: [nsonaazụ, ọnụọgụ ma ọ bụ nchọpụta kpọmkwem].\n3. Ihe ọ pụtara: [ihe mere ihe akaebe ji dị mkpa].\n4. Oke: [ihe nsonaazụ ahụ na-enweghị ike igosi].",
+        "fallback": "Onye na-enye AI adịghị, ya mere ejiri local demo coaching mee ka mmemme ahụ gaa n'ihu.",
+    },
+    "sw": {
+        "roles": [
+            ("Msimamizi wa utafiti", "Tatizo na athari"),
+            ("Mtahini wa mbinu", "Mbinu za utafiti"),
+            ("Mkaguzi wa ushahidi", "Matokeo na ushahidi"),
+            ("Mtahini wa nje", "Mipaka"),
+            ("Mkaguzi wa athari", "Matumizi halisi"),
+        ],
+        "questions": [
+            "Utafiti wako kuhusu '{topic}' unatatua tatizo gani, na nani atanufaika zaidi na matokeo yake?",
+            "Kwa nini ulichagua mbinu hii ya utafiti, na ni njia gani mbadala uliyoifikiria lakini ukaiacha?",
+            "Ni matokeo gani muhimu zaidi katika kazi yako, na ni ushahidi gani unaoyaunga mkono zaidi?",
+            "Ni upungufu gani mkubwa zaidi wa utafiti wako, na unapaswa kuathirije tafsiri ya matokeo?",
+            "Kama ungegeuza utafiti huu kuwa suluhisho la matumizi halisi, hatua inayofuata ingekuwa ipi na ungepimaje mafanikio?",
+        ],
+        "labels": {"clarity": "uwazi", "relevance": "uhusiano na swali", "evidence": "matumizi ya ushahidi", "structure": "muundo wa jibu"},
+        "strength": "Eneo lenye nguvu zaidi katika jibu lako ni {label}.",
+        "improvement": "Eneo muhimu zaidi la kuboresha katika jibu linalofuata ni {label}.",
+        "tips": {
+            "clarity": "Anza na sentensi moja inayojibu swali moja kwa moja kabla ya kuongeza maelezo.",
+            "relevance": "Rudia sehemu muhimu ya swali la mtahini na uunganishe kila hoja nayo.",
+            "evidence": "Ongeza matokeo moja, namba, mfano au uchunguzi halisi kutoka kwenye utafiti wako.",
+            "structure": "Tumia muundo rahisi: dai → ushahidi → umuhimu → kikomo.",
+        },
+        "feedback": "Jibu lako limepimwa kwa uwazi, uhusiano na swali, ushahidi na muundo. Alama hii haiamui kama utafiti wako ni sahihi kisayansi; inaonyesha jinsi jibu lako lilivyo rahisi kulitetea mbele ya jopo.",
+        "framework": "Muundo bora wa jibu unaoweza kujaza kwa utafiti wako halisi:\n1. Dai kuu: [jibu la moja kwa moja].\n2. Ushahidi: [matokeo, namba au uchunguzi maalum].\n3. Umuhimu: [kwa nini ushahidi huo ni muhimu].\n4. Kikomo: [kile ambacho matokeo hayawezi kuthibitisha].",
+        "fallback": "Mtoa huduma wa AI hakupatikana, kwa hiyo local demo coaching imetumika ili mazoezi yako yaendelee.",
+    },
+    "zu": {
+        "roles": [
+            ("Umqondisi wocwaningo", "Inkinga nomthelela"),
+            ("Umhloli wezindlela", "Indlela yocwaningo"),
+            ("Umhloli wobufakazi", "Imiphumela nobufakazi"),
+            ("Umhloli wangaphandle", "Imikhawulo"),
+            ("Umhloli womthelela", "Ukusetshenziswa empilweni"),
+        ],
+        "questions": [
+            "Ucwaningo lwakho ngo-'{topic}' luxazulula yiphi inkinga, futhi ubani ozohlomula kakhulu emiphumeleni yalo?",
+            "Kungani ukhethe le ndlela yocwaningo, futhi iyiphi enye indlela oyicabangile kodwa wangayisebenzisa?",
+            "Yimuphi umphumela obaluleke kakhulu emsebenzini wakho, futhi yibuphi ubufakazi obuwusekela kakhulu?",
+            "Yimuphi umkhawulo omkhulu wocwaningo lwakho, futhi lowo mkhawulo kufanele uthinte kanjani ukuhunyushwa kwemiphumela?",
+            "Uma ungaguqula lolu cwaningo lube yisixazululo sangempela, yisiphi isinyathelo esilandelayo futhi ungalinganisa kanjani impumelelo?",
+        ],
+        "labels": {"clarity": "ukucaca", "relevance": "ukuhambisana nombuzo", "evidence": "ukusebenzisa ubufakazi", "structure": "isakhiwo sempendulo"},
+        "strength": "Ingxenye enamandla kakhulu empendulweni yakho ngu-{label}.",
+        "improvement": "Into ebaluleke kakhulu ongayithuthukisa empendulweni elandelayo ngu-{label}.",
+        "tips": {
+            "clarity": "Qala ngomusho owodwa ophendula umbuzo ngqo ngaphambi kokwengeza imininingwane.",
+            "relevance": "Phinda ingxenye ebalulekile yombuzo bese uxhumanisa wonke amaphuzu akho nayo.",
+            "evidence": "Faka umphumela owodwa, inombolo, isibonelo noma okubonile ngokuqondile ocwaningweni lwakho.",
+            "structure": "Sebenzisa isakhiwo esilula: iphuzu → ubufakazi → ukubaluleka → umkhawulo.",
+        },
+        "feedback": "Impendulo yakho ihlolwe ngokucaca, ukuhambisana nombuzo, ubufakazi nesakhiwo. Leli phuzu alisho ukuthi ucwaningo lwakho lunembile ngokwesayensi; libonisa ukuthi impendulo ibonakala ivikeleka kangakanani phambi kwejopo.",
+        "framework": "Isakhiwo esiqinile sempendulo ongagcwalisa ngocwaningo lwakho lwangempela:\n1. Iphuzu eliyinhloko: [impendulo eqondile].\n2. Ubufakazi: [umphumela, inombolo noma okubonile].\n3. Ukubaluleka: [kungani lobo bufakazi bubalulekile].\n4. Umkhawulo: [lokho umphumela ongakwazi ukukufakazela].",
+        "fallback": "Umhlinzeki we-AI akatholakali, ngakho kusetshenziswe local demo coaching ukuze ukuqeqeshwa kuqhubeke.",
+    },
+}
 
 
 class ThesisInput(BaseModel):
@@ -45,48 +226,21 @@ class AnswerInput(BaseModel):
 
 
 def language_name(language: Language) -> str:
-    return "Hausa" if language == "ha" else "English"
+    return LANGUAGE_NAMES[language]
 
 
 def panel_templates(language: Language) -> list[dict[str, str]]:
-    if language == "ha":
-        return [
-            {"role": "Mai kula da bincike", "category": "Matsala da tasiri"},
-            {"role": "Mai nazarin hanya", "category": "Hanyar bincike"},
-            {"role": "Mai duba hujja", "category": "Sakamako da hujja"},
-            {"role": "Mai jarrabawa na waje", "category": "Iyakoki"},
-            {"role": "Mai duba tasiri", "category": "Amfani a aikace"},
-        ]
     return [
-        {"role": "Research supervisor", "category": "Problem & impact"},
-        {"role": "Methodology examiner", "category": "Methodology"},
-        {"role": "Evidence reviewer", "category": "Results & evidence"},
-        {"role": "External examiner", "category": "Limitations"},
-        {"role": "Impact reviewer", "category": "Practical application"},
+        {"role": role, "category": category}
+        for role, category in LOCALES[language]["roles"]
     ]
 
 
 def demo_questions(topic: str, language: Language) -> list[dict[str, str]]:
-    if language == "ha":
-        questions = [
-            f"Wace matsala bincikenka kan '{topic}' yake warwarewa, kuma wa zai fi amfana da sakamakonsa?",
-            "Me ya sa ka zabi wannan hanyar bincike, kuma wace hanya ce ka yi la'akari da ita amma ka ki amfani da ita?",
-            "Mene ne mafi muhimmancin sakamako daga aikinka, kuma wace shaida ce ta fi goyon bayansa?",
-            "Mene ne babban iyakar bincikenka, kuma ta yaya wannan iyakar ke shafar yadda ya kamata a fassara sakamakon?",
-            "Idan za ka mayar da wannan bincike zuwa mafita ta zahiri, mene ne mataki na gaba kuma yaya za ka auna nasara?",
-        ]
-    else:
-        questions = [
-            f"What problem does your research on '{topic}' solve, and who benefits most from the result?",
-            "Why did you choose this methodology, and what alternative approach did you consider but reject?",
-            "What is the most important result from your work, and what evidence best supports it?",
-            "What is the biggest limitation of your research, and how should that limitation affect interpretation of the results?",
-            "If you turned this research into a real-world solution, what would you do next and how would you measure success?",
-        ]
-
+    questions = [template.format(topic=topic) for template in LOCALES[language]["questions"]]
     return [
-        {"id": f"q{index + 1}", **template, "question": question}
-        for index, (template, question) in enumerate(zip(panel_templates(language), questions, strict=True))
+        {"id": f"q{index + 1}", **panel, "question": question}
+        for index, (panel, question) in enumerate(zip(panel_templates(language), questions, strict=True))
     ]
 
 
@@ -117,9 +271,27 @@ def normalize_questions(raw_questions: object, language: Language) -> list[dict[
 STOPWORDS = {
     "the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "is", "are", "was", "were", "this", "that",
     "what", "why", "how", "your", "you", "my", "our", "with", "from", "it", "be", "as", "at", "by", "we", "i",
-    "da", "na", "ne", "ce", "ya", "ta", "su", "a", "ko", "me", "yaya", "wace", "mene", "kuma", "daga", "don",
+    "da", "na", "ne", "ce", "ya", "ta", "su", "ko", "me", "yaya", "wace", "mene", "kuma", "daga", "don",
+    "ni", "na", "kwa", "ya", "la", "wa", "au", "hii", "hiyo", "nini", "jinsi", "kati", "kwenye",
 }
-WORD_RE = re.compile(r"[\w'-]+", re.UNICODE)
+WORD_RE = re.compile(r"[\w'’-]+", re.UNICODE)
+
+REASONING_MARKERS = [
+    "because", "therefore", "result", "evidence", "data", "found", "showed", "sample", "study",
+    "saboda", "don haka", "sakamako", "shaida", "bayanai", "bincike",
+    "nítorí", "ẹ̀rí", "àbájáde", "ìwádìí",
+    "n'ihi", "ihe akaebe", "nsonaazụ", "nnyocha",
+    "kwa sababu", "ushahidi", "matokeo", "utafiti",
+    "ngoba", "ubufakazi", "imiphumela", "ucwaningo",
+]
+STRUCTURE_MARKERS = [
+    "first", "second", "finally", "however", "although", "in conclusion", "for example",
+    "na farko", "sannan", "a ƙarshe", "amma", "misali",
+    "àkọ́kọ́", "lẹ́yìn náà", "ní ìparí", "fún àpẹẹrẹ",
+    "nke mbụ", "mgbe ahụ", "n'ikpeazụ", "dịka ọmụmaatụ",
+    "kwanza", "pili", "hatimaye", "kwa mfano",
+    "okokuqala", "bese", "ekugcineni", "isibonelo",
+]
 
 
 def meaningful_words(text: str) -> set[str]:
@@ -135,21 +307,11 @@ def score_dimensions(topic: str, question: str, answer: str) -> dict[str, int]:
     word_count = len(words)
     answer_lower = answer.lower()
     sentence_count = max(1, len(re.findall(r"[.!?]+", answer)))
-
     context_terms = meaningful_words(f"{topic} {question}")
     answer_terms = meaningful_words(answer)
     overlap = len(context_terms & answer_terms)
-
-    reasoning_markers = [
-        "because", "therefore", "result", "evidence", "data", "found", "showed", "sample", "study",
-        "saboda", "don haka", "sakamako", "shaida", "bayanai", "bincike",
-    ]
-    structure_markers = [
-        "first", "second", "finally", "however", "although", "in conclusion", "for example",
-        "na farko", "sannan", "a karshe", "amma", "misali",
-    ]
-    has_reasoning = any(marker in answer_lower for marker in reasoning_markers)
-    has_structure = any(marker in answer_lower for marker in structure_markers)
+    has_reasoning = any(marker in answer_lower for marker in REASONING_MARKERS)
+    has_structure = any(marker in answer_lower for marker in STRUCTURE_MARKERS)
     has_number = bool(re.search(r"\d", answer))
 
     clarity = 50 + min(28, word_count) + min(8, sentence_count * 2)
@@ -167,81 +329,23 @@ def score_dimensions(topic: str, question: str, answer: str) -> dict[str, int]:
     }
 
 
-def coaching_copy(language: Language, dimensions: dict[str, int]) -> tuple[list[str], list[str], str]:
-    strongest = max(dimensions, key=dimensions.get)
-    weakest = min(dimensions, key=dimensions.get)
-
-    if language == "ha":
-        labels = {
-            "clarity": "bayyananniyar amsa",
-            "relevance": "dacewa da tambaya",
-            "evidence": "amfani da hujja",
-            "structure": "tsarin amsa",
-        }
-        strengths = [f"Mafi karfin bangaren amsarka shi ne {labels[strongest]}."]
-        improvements = [f"Ka fi bukatar inganta {labels[weakest]} a amsa ta gaba."]
-        tips = {
-            "clarity": "Fara da jimla daya da ke bada amsa kai tsaye kafin karin bayani.",
-            "relevance": "Maimaita muhimmin bangaren tambayar sannan ka danganta amsarka da shi kai tsaye.",
-            "evidence": "Kara sakamako, adadi, misali ko wata hujja takamaimai daga bincikenka.",
-            "structure": "Yi amfani da tsari mai sauki: batu → hujja → muhimmanci → iyaka.",
-        }
-    else:
-        labels = {
-            "clarity": "clarity",
-            "relevance": "relevance to the question",
-            "evidence": "use of evidence",
-            "structure": "answer structure",
-        }
-        strengths = [f"Your strongest area in this response is {labels[strongest]}."]
-        improvements = [f"Your biggest opportunity for the next answer is {labels[weakest]}."]
-        tips = {
-            "clarity": "Lead with one sentence that directly answers the question before adding detail.",
-            "relevance": "Echo the key part of the examiner's question and connect every point back to it.",
-            "evidence": "Add one concrete result, number, example, or observation from your own research.",
-            "structure": "Use a simple structure: claim → evidence → significance → limitation.",
-        }
-    return strengths, improvements, tips[weakest]
-
-
 def demo_evaluation(payload: AnswerInput) -> dict:
     dimensions = score_dimensions(payload.topic, payload.question, payload.answer)
     score = round(sum(dimensions.values()) / len(dimensions))
-    strengths, improvements, next_tip = coaching_copy(payload.language, dimensions)
-
-    if payload.language == "ha":
-        feedback = (
-            "An auna amsarka ta fuskar bayyanawa, dacewa da tambaya, hujja, da tsari. "
-            "Makin ba ya nuna ko bincikenka daidai ne; yana nuna yadda amsar ta kasance mai saukin karewa a gaban kwamitin."
-        )
-        improved = (
-            "Tsarin da za ka iya amfani da shi:\n"
-            "1. Babban batu: [amsa kai tsaye ga tambayar].\n"
-            "2. Hujja: [takamaiman sakamako, adadi ko misali daga bincikenka].\n"
-            "3. Muhimmanci: [me wannan sakamakon yake nufi].\n"
-            "4. Iyakar bincike: [abin da sakamakon ba zai iya tabbatarwa ba]."
-        )
-    else:
-        feedback = (
-            "Your response was assessed for clarity, relevance, evidence, and structure. "
-            "This score does not judge whether your research is scientifically correct; it reflects how defensible the written answer sounds to a panel."
-        )
-        improved = (
-            "A stronger answer structure you can fill with your real research:\n"
-            "1. Main claim: [direct answer to the examiner's question].\n"
-            "2. Evidence: [specific result, number, or observation from your study].\n"
-            "3. Significance: [why that evidence matters].\n"
-            "4. Limitation: [what the result cannot prove or where caution is needed]."
-        )
+    locale = LOCALES[payload.language]
+    strongest = max(dimensions, key=dimensions.get)
+    weakest = min(dimensions, key=dimensions.get)
+    strengths = [locale["strength"].format(label=locale["labels"][strongest])]
+    improvements = [locale["improvement"].format(label=locale["labels"][weakest])]
 
     return {
         "score": score,
         "dimensions": dimensions,
         "strengths": strengths,
         "improvements": improvements,
-        "feedback": feedback,
-        "improved_answer": improved,
-        "next_tip": next_tip,
+        "feedback": locale["feedback"],
+        "improved_answer": locale["framework"],
+        "next_tip": locale["tips"][weakest],
         "word_count": len(WORD_RE.findall(payload.answer)),
         "mode": "demo",
         "language": payload.language,
@@ -282,9 +386,7 @@ async def call_llm(messages: list[dict]) -> dict:
 
 
 def fallback_notice(language: Language) -> str:
-    if language == "ha":
-        return "Ba a samu AI provider ba, don haka an yi amfani da local demo coaching domin kada atisayen ya tsaya."
-    return "The AI provider was unavailable, so local demo coaching was used to keep the practice session working."
+    return LOCALES[language]["fallback"]
 
 
 def suggested_topic_from_text(text: str) -> str:
@@ -320,7 +422,7 @@ def health() -> dict:
         "version": APP_VERSION,
         "mode": "demo" if DEMO_MODE else "llm",
         "fallback_to_demo": AI_FALLBACK_TO_DEMO,
-        "languages": ["en", "ha"],
+        "languages": list(SUPPORTED_LANGUAGES),
         "upload_types": ["pdf", "txt", "md"],
     }
 
@@ -379,7 +481,7 @@ async def generate_questions(payload: ThesisInput) -> dict:
                 "content": (
                     "You are a realistic but supportive university thesis defence panel. Return JSON only with a 'questions' array of exactly five objects. "
                     "Each object must contain 'role', 'category', and 'question'. Cover problem/impact, methodology, evidence/results, limitations, and practical application. "
-                    f"Write all visible text in {target_language}. Keep each question concise and specific to the provided research when possible."
+                    f"Write every visible field in {target_language}. Keep each question concise and specific to the provided research when possible."
                 ),
             },
             {"role": "user", "content": f"Thesis topic: {topic}\n\nResearch context: {context}"},
@@ -430,7 +532,7 @@ async def evaluate_answer(payload: AnswerInput) -> dict:
         improvements = [str(item) for item in result["improvements"]][:3]
         if not strengths or not improvements:
             raise ValueError("Coaching lists cannot be empty")
-        response = {
+        return {
             "score": round(sum(dimensions.values()) / len(dimensions)),
             "dimensions": dimensions,
             "strengths": strengths,
@@ -442,7 +544,6 @@ async def evaluate_answer(payload: AnswerInput) -> dict:
             "mode": "llm",
             "language": payload.language,
         }
-        return response
     except (HTTPException, KeyError, TypeError, ValueError) as exc:
         if not AI_FALLBACK_TO_DEMO:
             if isinstance(exc, HTTPException):
