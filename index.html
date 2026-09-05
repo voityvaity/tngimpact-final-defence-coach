@@ -3,25 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="Bilingual AI thesis defence practice for students: virtual panel questions, voice practice, and structured coaching." />
+  <meta name="theme-color" content="#173f32" />
+  <meta name="description" content="Multilingual AI thesis defence practice built for African students: virtual panel questions, voice practice, and structured coaching." />
   <title>Final Defence Coach</title>
   <style>
     :root {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #172033;
-      background: #f3f6fb;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #2b241d;
+      background: #f7f0e4;
       font-synthesis: none;
-      --ink: #172033;
-      --muted: #66758a;
-      --line: #dfe6ef;
-      --blue: #315fe6;
-      --blue-soft: #edf2ff;
-      --green: #16805c;
-      --green-soft: #e6f8f1;
-      --amber: #7b5c12;
-      --amber-soft: #fff7df;
-      --danger: #b42318;
+      --ink: #2b241d;
+      --muted: #766b5f;
+      --cream: #fffaf1;
+      --sand: #f7f0e4;
+      --line: #e4d6c3;
+      --earth: #a34f34;
+      --earth-dark: #7e3927;
+      --gold: #d89c38;
+      --gold-soft: #fff1cf;
+      --green: #21674f;
+      --green-dark: #173f32;
+      --green-soft: #e7f1eb;
+      --charcoal: #22251f;
+      --danger: #a93226;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -29,225 +33,210 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 8% -8%, rgba(49, 95, 230, .14), transparent 31rem),
-        radial-gradient(circle at 100% 2%, rgba(22, 128, 92, .11), transparent 28rem),
-        #f3f6fb;
+        radial-gradient(circle at 8% -5%, rgba(216,156,56,.18), transparent 28rem),
+        radial-gradient(circle at 97% 5%, rgba(33,103,79,.12), transparent 26rem),
+        linear-gradient(rgba(163,79,52,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(163,79,52,.025) 1px, transparent 1px),
+        var(--sand);
+      background-size: auto, auto, 32px 32px, 32px 32px, auto;
     }
     button, input, textarea, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; }
     button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-      outline: 3px solid rgba(49, 95, 230, .24);
+      outline: 3px solid rgba(216,156,56,.42);
       outline-offset: 2px;
     }
-    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 54px; }
+    .wrap { width: min(1140px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 54px; }
+
     .hero {
       position: relative;
       overflow: hidden;
-      color: #fff;
-      background: linear-gradient(135deg, #0b1220 0%, #152644 62%, #123c36 100%);
-      border-radius: 28px;
-      padding: 34px;
-      box-shadow: 0 24px 64px rgba(15, 23, 42, .18);
+      color: #fffaf1;
+      background: linear-gradient(135deg, #183f33 0%, #1f4d3d 46%, #482e24 100%);
+      border-radius: 30px;
+      padding: 38px;
+      box-shadow: 0 26px 70px rgba(63,42,27,.22);
+      isolation: isolate;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      opacity: .22;
+      background:
+        linear-gradient(135deg, transparent 42%, rgba(255,255,255,.13) 42% 48%, transparent 48% 100%) 0 0/44px 44px,
+        linear-gradient(45deg, transparent 42%, rgba(216,156,56,.18) 42% 48%, transparent 48% 100%) 22px 22px/44px 44px;
+      mask-image: linear-gradient(90deg, transparent 18%, #000 58%);
     }
     .hero::after {
       content: "";
       position: absolute;
-      right: -100px;
-      bottom: -150px;
-      width: 300px;
-      height: 300px;
+      width: 340px;
+      height: 340px;
+      right: -120px;
+      bottom: -190px;
+      border: 42px solid rgba(216,156,56,.16);
       border-radius: 50%;
-      background: rgba(255, 255, 255, .055);
+      z-index: -1;
     }
-    .hero-top { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 190px; gap: 28px; align-items: start; }
-    .eyebrow { display: flex; align-items: center; gap: 9px; color: #a7f3d0; font-size: 12px; font-weight: 900; letter-spacing: .085em; text-transform: uppercase; }
-    .dot { width: 8px; height: 8px; border-radius: 999px; background: #34d399; box-shadow: 0 0 0 5px rgba(52, 211, 153, .12); }
-    h1 { margin: 12px 0 11px; font-size: clamp(2.35rem, 6vw, 4.55rem); line-height: .97; letter-spacing: -.052em; }
-    .hero-copy { margin: 0; max-width: 760px; color: #cbd5e1; line-height: 1.65; font-size: 1.04rem; }
-    .language-box label { display: block; margin-bottom: 7px; color: #cbd5e1; font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: .06em; }
-    .hero select { border-color: rgba(255,255,255,.17); background: rgba(255,255,255,.97); }
-    .hero-actions { position: relative; z-index: 1; display: flex; gap: 10px; flex-wrap: wrap; margin-top: 23px; }
-    .hero-pills { position: relative; z-index: 1; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
-    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.13); border-radius: 999px; background: rgba(255,255,255,.07); color: #e2e8f0; font-size: 12px; font-weight: 760; }
-    .mode-live { color: #d1fae5; }
-    .mode-demo { color: #fde68a; }
+    .kente-band {
+      height: 11px;
+      border-radius: 999px;
+      margin-bottom: 15px;
+      background:
+        repeating-linear-gradient(90deg,
+          #d89c38 0 18px,
+          #a34f34 18px 34px,
+          #173f32 34px 52px,
+          #f6d270 52px 61px,
+          #2b241d 61px 72px
+        );
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
+    }
+    .hero-top { display: grid; grid-template-columns: minmax(0,1fr) 210px; gap: 30px; align-items: start; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; color: #f4cf78; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .sun-dot { width: 9px; height: 9px; border-radius: 50%; background: #e1a441; box-shadow: 0 0 0 6px rgba(225,164,65,.12); }
+    h1 { margin: 13px 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.55rem, 6.5vw, 5rem); line-height: .92; letter-spacing: -.045em; font-weight: 700; }
+    .hero-copy { margin: 0; max-width: 760px; color: #e7e1d8; line-height: 1.68; font-size: 1.05rem; }
+    .language-box { background: rgba(255,250,241,.09); border: 1px solid rgba(255,250,241,.14); border-radius: 18px; padding: 13px; backdrop-filter: blur(8px); }
+    .language-box label { display: block; margin-bottom: 7px; color: #f2dfbc; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+    .hero select { border-color: rgba(255,255,255,.18); background: #fffaf1; color: #2b241d; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px; }
+    .hero-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(255,255,255,.075); color: #f3eee5; font-size: 12px; font-weight: 780; }
+    .mode-live { color: #c9f3d9; }
+    .mode-demo { color: #ffe6a9; }
 
-    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; margin-top: 22px; align-items: start; }
+    .layout { display: grid; grid-template-columns: minmax(0,1fr) 310px; gap: 22px; margin-top: 22px; align-items: start; }
     .stack { min-width: 0; }
-    .card, .side-card {
-      background: rgba(255,255,255,.97);
-      border: 1px solid var(--line);
-      box-shadow: 0 10px 34px rgba(15, 23, 42, .055);
-    }
-    .card { border-radius: 22px; padding: 24px; margin-bottom: 18px; }
+    .card, .side-card { background: rgba(255,250,241,.96); border: 1px solid var(--line); box-shadow: 0 11px 35px rgba(91,67,44,.07); }
+    .card { border-radius: 23px; padding: 25px; margin-bottom: 18px; }
+    .card::before { content: ""; display: block; width: 42px; height: 4px; margin-bottom: 18px; border-radius: 99px; background: linear-gradient(90deg,var(--earth),var(--gold),var(--green)); }
     .side { position: sticky; top: 18px; }
-    .side-card { border-radius: 19px; padding: 19px; margin-bottom: 14px; }
+    .side-card { border-radius: 20px; padding: 20px; margin-bottom: 14px; }
     .card-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
-    .step { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-right: 9px; border-radius: 9px; background: var(--blue-soft); color: #2e59c4; font-size: 13px; font-weight: 950; }
+    .step { display: inline-grid; place-items: center; width: 29px; height: 29px; margin-right: 9px; border-radius: 10px; background: var(--gold-soft); color: #7f5410; font-size: 13px; font-weight: 950; }
     h2 { display: flex; align-items: center; margin: 0; font-size: 1.16rem; letter-spacing: -.014em; }
     h3 { margin: 20px 0 8px; font-size: .98rem; }
-    .subtle { margin: 6px 0 0; color: var(--muted); line-height: 1.48; font-size: 13px; }
-    .side-title { margin: 0 0 11px; font-size: .95rem; }
+    .subtle { margin: 6px 0 0; color: var(--muted); line-height: 1.5; font-size: 13px; }
+    .side-title { margin: 0 0 11px; font-size: .96rem; }
 
     label.field-label { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 15px 0 7px; font-weight: 850; font-size: 13px; }
-    label.field-label small { color: #8997a9; font-weight: 650; }
-    input, textarea, select {
-      width: 100%;
-      border: 1px solid #d6deea;
-      border-radius: 13px;
-      padding: 13px 14px;
-      color: var(--ink);
-      background: #fff;
-      outline: none;
-      transition: border-color .16s ease, box-shadow .16s ease;
-    }
-    input:focus, textarea:focus, select:focus { border-color: #6488ec; box-shadow: 0 0 0 4px rgba(49,95,230,.09); }
+    label.field-label small { color: #9b8b7a; font-weight: 650; }
+    input, textarea, select { width: 100%; border: 1px solid #d9cab6; border-radius: 13px; padding: 13px 14px; color: var(--ink); background: #fffdf8; outline: none; transition: border-color .16s ease, box-shadow .16s ease; }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(216,156,56,.12); }
     textarea { min-height: 142px; resize: vertical; line-height: 1.52; }
-    #answer { min-height: 168px; }
-    .counter { margin-top: 6px; color: #8a98aa; text-align: right; font-size: 11px; }
+    #answer { min-height: 170px; }
+    .counter { margin-top: 6px; color: #9c8f82; text-align: right; font-size: 11px; }
 
-    .upload-box {
-      margin-top: 14px;
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      align-items: center;
-      padding: 13px 14px;
-      border: 1px dashed #b9c8df;
-      border-radius: 14px;
-      background: #f8faff;
-    }
-    .upload-copy { color: #56677d; font-size: 12px; line-height: 1.45; }
-    .upload-copy strong { display: block; color: #26364a; margin-bottom: 2px; }
+    .upload-box { margin-top: 14px; display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 14px; border: 1px dashed #c8ae8d; border-radius: 15px; background: #fff7e8; }
+    .upload-copy { color: #71604d; font-size: 12px; line-height: 1.46; }
+    .upload-copy strong { display: block; color: #3d3026; margin-bottom: 2px; }
     #fileInput { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
     .actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 16px; }
-    .btn {
-      border: 0;
-      border-radius: 12px;
-      min-height: 44px;
-      padding: 11px 15px;
-      cursor: pointer;
-      font-weight: 850;
-      transition: transform .12s ease, opacity .15s ease, box-shadow .15s ease;
-    }
+    .btn { border: 0; border-radius: 12px; min-height: 44px; padding: 11px 15px; cursor: pointer; font-weight: 850; transition: transform .12s ease, opacity .15s ease, box-shadow .15s ease; }
     .btn:hover:not(:disabled) { transform: translateY(-1px); }
     .btn:disabled { opacity: .52; cursor: not-allowed; transform: none; }
-    .btn-primary { color: #fff; background: linear-gradient(135deg, #315fe6, #2351c8); box-shadow: 0 9px 20px rgba(49,95,230,.2); }
-    .btn-secondary { color: #27374a; background: #edf2f8; }
-    .btn-ghost { color: #315fe6; background: transparent; border: 1px solid #cdd9ee; }
-    .btn-green { color: #075f46; background: #ddf6ec; }
-    .hero .btn-primary { background: #fff; color: #10213d; box-shadow: none; }
-    .hero .btn-ghost { color: #fff; border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.06); }
+    .btn-primary { color: #fffaf1; background: linear-gradient(135deg,var(--earth),var(--earth-dark)); box-shadow: 0 9px 20px rgba(126,57,39,.2); }
+    .btn-secondary { color: #4a392c; background: #f0e3d1; }
+    .btn-ghost { color: var(--green); background: transparent; border: 1px solid #c6b79f; }
+    .btn-green { color: #fff; background: var(--green); }
+    .hero .btn-primary { background: #f4c867; color: #302318; box-shadow: none; }
+    .hero .btn-ghost { color: #fffaf1; border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.06); }
 
     .status, .error { min-height: 18px; margin-top: 9px; font-size: 12px; font-weight: 760; line-height: 1.4; }
-    .status { color: #315fe6; }
+    .status { color: var(--green); }
     .error { color: var(--danger); }
-    .notice { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--amber-soft); border: 1px solid #efdda1; color: var(--amber); font-size: 12px; font-weight: 720; line-height: 1.45; }
+    .notice { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--gold-soft); border: 1px solid #e6c875; color: #6e4a0e; font-size: 12px; font-weight: 720; line-height: 1.45; }
     .hidden { display: none !important; }
 
     .questions-grid { display: grid; gap: 10px; margin-top: 12px; }
-    .question-card {
-      display: grid;
-      grid-template-columns: 38px 1fr auto;
-      gap: 11px;
-      align-items: start;
-      width: 100%;
-      text-align: left;
-      border: 1px solid #dce4ee;
-      border-radius: 15px;
-      padding: 13px;
-      color: #26364a;
-      background: #fff;
-      cursor: pointer;
-      line-height: 1.43;
-      transition: border-color .14s ease, background .14s ease, transform .12s ease;
-    }
-    .question-card:hover { border-color: #aebee5; transform: translateY(-1px); }
-    .question-card.active { border-color: #4f7df3; background: #f5f8ff; box-shadow: inset 0 0 0 1px #4f7df3; }
-    .question-card.done { border-color: #b9dfd0; }
-    .avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: var(--blue-soft); color: #315fe6; font-size: 12px; font-weight: 950; }
-    .q-role { color: #31445d; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .035em; }
-    .q-text { margin-top: 4px; font-size: 13px; }
-    .q-category { display: inline-flex; margin-top: 7px; padding: 4px 7px; border-radius: 999px; background: #f0f4f8; color: #64748b; font-size: 10px; font-weight: 800; }
+    .question-card { display: grid; grid-template-columns: 40px 1fr auto; gap: 11px; align-items: start; width: 100%; text-align: left; border: 1px solid #e2d5c4; border-radius: 16px; padding: 14px; color: #3b3028; background: #fffdf8; cursor: pointer; line-height: 1.43; transition: border-color .14s ease, background .14s ease, transform .12s ease; }
+    .question-card:hover { border-color: #c99a64; transform: translateY(-1px); }
+    .question-card.active { border-color: var(--earth); background: #fff5ec; box-shadow: inset 0 0 0 1px var(--earth); }
+    .question-card.done { border-color: #9fc8b6; }
+    .avatar { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50% 50% 44% 56%; background: var(--green-soft); color: var(--green); font-size: 12px; font-weight: 950; }
+    .q-role { color: var(--earth-dark); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .035em; }
+    .q-text { display: block; margin-top: 4px; font-size: 13px; }
+    .q-category { display: inline-flex; margin-top: 7px; padding: 4px 8px; border-radius: 999px; background: #f4eadc; color: #79644e; font-size: 10px; font-weight: 800; }
     .done-mark { color: var(--green); font-weight: 950; font-size: 14px; }
 
-    .selected-panel { display: grid; grid-template-columns: 42px 1fr; gap: 11px; padding: 13px; border-radius: 14px; background: #f6f8fc; border: 1px solid #e0e7f1; margin-bottom: 14px; }
-    .selected-role { color: #315fe6; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
-    .selected-question { margin-top: 3px; color: #26364a; font-size: 14px; line-height: 1.45; font-weight: 760; }
+    .selected-panel { display: grid; grid-template-columns: 44px 1fr; gap: 11px; padding: 14px; border-radius: 15px; background: #fff6e9; border: 1px solid #ead3b1; margin-bottom: 14px; }
+    .selected-role { color: var(--earth-dark); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+    .selected-question { margin-top: 3px; color: #3b3028; font-size: 14px; line-height: 1.45; font-weight: 760; }
 
     .result-top { display: grid; grid-template-columns: 132px 1fr; gap: 22px; align-items: center; padding: 4px 0 10px; }
-    .score-ring { --score: 0; width: 126px; height: 126px; border-radius: 50%; background: conic-gradient(#1f9d70 calc(var(--score) * 1%), #e7edf4 0); display: grid; place-items: center; position: relative; }
-    .score-ring::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; background: #fff; }
+    .score-ring { --score: 0; width: 126px; height: 126px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--score)*1%), #eadfce 0); display: grid; place-items: center; position: relative; }
+    .score-ring::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; background: #fffaf1; }
     .score-inner { position: relative; z-index: 1; text-align: center; }
     .score { font-size: 33px; line-height: 1; font-weight: 950; letter-spacing: -.04em; }
-    .score-caption { margin-top: 5px; color: #718096; font-size: 10px; font-weight: 780; }
+    .score-caption { margin-top: 5px; color: #837667; font-size: 10px; font-weight: 780; }
     .breakdown { display: grid; gap: 9px; }
-    .metric-row { display: grid; grid-template-columns: 82px 1fr 32px; gap: 9px; align-items: center; color: #526276; font-size: 11px; font-weight: 780; }
-    .bar { height: 8px; overflow: hidden; border-radius: 999px; background: #e8edf4; }
-    .bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #315fe6, #22a06b); }
+    .metric-row { display: grid; grid-template-columns: 82px 1fr 32px; gap: 9px; align-items: center; color: #65584a; font-size: 11px; font-weight: 780; }
+    .bar { height: 8px; overflow: hidden; border-radius: 999px; background: #eadfce; }
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--earth),var(--gold),var(--green)); }
     .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-    .mini-result { border: 1px solid #e1e7f0; background: #f8fafc; border-radius: 14px; padding: 14px; }
+    .mini-result { border: 1px solid #e5d8c6; background: #fffdf8; border-radius: 14px; padding: 14px; }
     .mini-result strong { display: block; margin-bottom: 7px; font-size: 12px; }
-    .mini-result ul { margin: 0; padding-left: 18px; color: #526276; font-size: 12px; line-height: 1.5; }
-    .result-box { border: 1px solid #e1e7f0; background: #f8fafc; border-radius: 14px; padding: 15px; color: #334155; line-height: 1.58; white-space: pre-wrap; font-size: 13px; }
-    .tip { display: flex; gap: 9px; align-items: flex-start; margin-top: 13px; padding: 12px 13px; border-radius: 13px; background: var(--amber-soft); border: 1px solid #f0dfa4; color: #6d5415; font-size: 12px; font-weight: 720; line-height: 1.45; }
+    .mini-result ul { margin: 0; padding-left: 18px; color: #67594a; font-size: 12px; line-height: 1.5; }
+    .result-box { border: 1px solid #e5d8c6; background: #fffdf8; border-radius: 14px; padding: 15px; color: #514438; line-height: 1.58; white-space: pre-wrap; font-size: 13px; }
+    .tip { display: flex; gap: 9px; align-items: flex-start; margin-top: 13px; padding: 12px 13px; border-radius: 13px; background: var(--gold-soft); border: 1px solid #e6c875; color: #6c4d16; font-size: 12px; font-weight: 720; line-height: 1.45; }
 
-    .progress-block { margin-top: 6px; }
-    .progress-line { height: 9px; border-radius: 999px; overflow: hidden; background: #e8edf4; }
-    .progress-line span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #315fe6, #22a06b); transition: width .2s ease; }
-    .progress-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; color: #66758a; font-size: 11px; font-weight: 760; }
-    .summary-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-    .stat { padding: 10px; border-radius: 12px; background: #f5f7fb; }
-    .stat b { display: block; font-size: 18px; letter-spacing: -.03em; }
-    .stat span { color: #718096; font-size: 10px; font-weight: 750; }
-    .how-item { display: grid; grid-template-columns: 24px 1fr; gap: 9px; margin: 10px 0; color: #526276; font-size: 12px; line-height: 1.43; }
-    .how-item b { display: grid; place-items: center; width: 23px; height: 23px; border-radius: 8px; background: var(--blue-soft); color: #315fe6; font-size: 10px; }
-    .privacy { display: flex; gap: 9px; align-items: flex-start; color: #526276; font-size: 11px; line-height: 1.48; }
-    .mini-badge { display: inline-flex; margin-top: 10px; padding: 6px 8px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 10px; font-weight: 850; }
-    footer { text-align: center; color: #748296; margin-top: 24px; font-size: 11px; }
+    .progress-line { height: 9px; border-radius: 999px; background: #e7dbc9; overflow: hidden; }
+    .progress-line span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg,var(--earth),var(--gold),var(--green)); transition: width .25s ease; }
+    .progress-meta { display: flex; justify-content: space-between; margin-top: 7px; color: #7d6e5e; font-size: 11px; font-weight: 750; }
+    .summary-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 14px; }
+    .stat { padding: 11px; border-radius: 13px; background: #f7ecdc; }
+    .stat b { display: block; color: #3f3329; font-size: 18px; }
+    .stat span { color: #857564; font-size: 10px; }
+    .how-item { display: grid; grid-template-columns: 26px 1fr; gap: 9px; margin: 11px 0; color: #665949; font-size: 12px; line-height: 1.45; }
+    .how-item b { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--gold-soft); color: #805816; font-size: 11px; }
+    .privacy { display: flex; gap: 9px; align-items: flex-start; color: #665949; font-size: 12px; line-height: 1.45; }
+    .mini-badge { display: inline-flex; margin-top: 11px; padding: 6px 9px; border-radius: 999px; background: var(--green-soft); color: var(--green); font-size: 10px; font-weight: 850; }
+    .language-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+    .language-chip { padding: 6px 8px; border-radius: 999px; background: #f6ead9; color: #6c5945; border: 1px solid #ead8bd; font-size: 10px; font-weight: 800; }
+    footer { text-align: center; color: #8d7e6c; margin-top: 25px; font-size: 11px; }
 
-    @media (max-width: 880px) {
-      .layout { grid-template-columns: 1fr; }
-      .side { position: static; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-      .side-card { margin: 0; }
-    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+    @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } .side { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; } .side-card { margin: 0; } }
     @media (max-width: 650px) {
-      .wrap { width: min(calc(100% - 20px), 1120px); padding-top: 10px; }
-      .hero { border-radius: 20px; padding: 23px 19px; }
-      .hero-top { grid-template-columns: 1fr; gap: 18px; }
-      h1 { font-size: 2.7rem; }
+      .wrap { width: min(100% - 18px,1140px); padding-top: 9px; }
+      .hero { border-radius: 21px; padding: 24px 20px; }
+      .hero-top { grid-template-columns: 1fr; }
       .language-box { width: 100%; }
+      h1 { font-size: 3rem; }
       .card { border-radius: 18px; padding: 18px; }
       .side { grid-template-columns: 1fr; }
-      .upload-box { align-items: flex-start; flex-direction: column; }
-      .question-card { grid-template-columns: 36px 1fr; }
-      .done-mark { grid-column: 2; }
-      .result-top { grid-template-columns: 1fr; }
+      .result-top, .result-grid { grid-template-columns: 1fr; }
       .score-ring { margin: 0 auto; }
-      .result-grid { grid-template-columns: 1fr; }
-      .actions .btn { flex: 1 1 140px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { transition: none !important; }
+      .actions .btn { flex: 1 1 145px; }
+      .upload-box { align-items: flex-start; flex-direction: column; }
+      .question-card { grid-template-columns: 38px 1fr; }
+      .done-mark { display: none; }
     }
   </style>
 </head>
 <body>
   <main class="wrap">
     <section class="hero">
+      <div class="kente-band" aria-hidden="true"></div>
       <div class="hero-top">
         <div>
-          <div class="eyebrow"><span class="dot"></span><span id="eyebrow">AI for Education · Africa</span></div>
+          <div class="eyebrow"><span class="sun-dot"></span><span id="eyebrow">AI for Education · Built for Africa</span></div>
           <h1>Final Defence Coach</h1>
-          <p id="heroText" class="hero-copy">Turn your thesis into a realistic mock defence panel. Practise examiner questions, speak or type your answer, and get structured coaching in English or Hausa.</p>
+          <p id="heroText" class="hero-copy">Turn your thesis into a realistic mock defence panel. Practise hard questions, answer by voice or text, and improve with structured coaching.</p>
         </div>
         <div class="language-box">
-          <label id="languageLabel" for="language">Language</label>
-          <select id="language" aria-label="Language">
+          <label id="languageLabel" for="language">Choose language</label>
+          <select id="language" aria-label="Choose language">
             <option value="en">English</option>
             <option value="ha">Hausa</option>
+            <option value="yo">Yorùbá</option>
+            <option value="ig">Igbo</option>
+            <option value="sw">Kiswahili</option>
+            <option value="zu">isiZulu</option>
           </select>
         </div>
       </div>
@@ -257,7 +246,7 @@
       </div>
       <div class="hero-pills">
         <span class="pill">🎓 <span id="pillPanel">5-examiner virtual panel</span></span>
-        <span class="pill">🌍 <span id="pillLocal">English + Hausa</span></span>
+        <span class="pill">🌍 <span id="pillLocal">Multilingual for Africa</span></span>
         <span class="pill">📄 <span id="pillUpload">PDF / TXT / MD</span></span>
         <span class="pill" id="modePill">● <span id="modeText">Checking mode…</span></span>
       </div>
@@ -266,121 +255,49 @@
     <div class="layout">
       <section class="stack">
         <section class="card" id="researchCard">
-          <div class="card-head">
-            <div>
-              <h2><span class="step">1</span><span id="step1Title">Add your research</span></h2>
-              <p id="step1Sub" class="subtle">A topic is enough. Add a summary or upload your thesis for more specific panel questions.</p>
-            </div>
-          </div>
-
+          <div class="card-head"><div><h2><span class="step">1</span><span id="step1Title">Bring your research</span></h2><p id="step1Sub" class="subtle">A topic is enough. Add a summary or upload your thesis for more specific panel questions.</p></div></div>
           <label class="field-label" for="topic"><span id="topicLabel">Thesis topic</span><small id="topicHint">required</small></label>
           <input id="topic" maxlength="300" autocomplete="off" placeholder="e.g. AI-assisted crop disease detection for smallholder farmers" />
-
           <label class="field-label" for="abstract"><span id="abstractLabel">Research context</span><small id="abstractHint">optional</small></label>
           <textarea id="abstract" maxlength="12000" placeholder="Paste your abstract, methods, findings, or a short project summary."></textarea>
           <div class="counter"><span id="contextCount">0</span>/12000</div>
-
           <div class="upload-box">
-            <div class="upload-copy">
-              <strong id="uploadTitle">Upload thesis or notes</strong>
-              <span id="uploadSub">PDF, TXT or Markdown · max 6 MB · extracted text is not stored on the server.</span>
-            </div>
+            <div class="upload-copy"><strong id="uploadTitle">Upload thesis or notes</strong><span id="uploadSub">PDF, TXT or Markdown · max 6 MB · extracted text is not stored on the server.</span></div>
             <label class="btn btn-ghost" for="fileInput" id="uploadBtn">Choose file</label>
             <input id="fileInput" type="file" accept=".pdf,.txt,.md,text/plain,text/markdown,application/pdf" />
           </div>
           <div id="fileStatus" class="status" role="status" aria-live="polite"></div>
-
-          <div class="actions">
-            <button class="btn btn-secondary" id="exampleBtn" type="button">✨ Use example</button>
-            <button class="btn btn-primary" id="generateBtn" type="button">Build my defence panel</button>
-          </div>
+          <div class="actions"><button class="btn btn-secondary" id="exampleBtn" type="button">✨ Use example</button><button class="btn btn-primary" id="generateBtn" type="button">Build my defence panel</button></div>
           <div id="generateError" class="error" role="alert" aria-live="assertive"></div>
           <div id="generateNotice" class="notice hidden" role="status"></div>
         </section>
 
         <section class="card hidden" id="questionsCard">
-          <div class="card-head">
-            <div>
-              <h2><span class="step">2</span><span id="step2Title">Meet your virtual panel</span></h2>
-              <p id="step2Sub" class="subtle">Each examiner focuses on a different part of your defence. Pick any question to practise.</p>
-            </div>
-          </div>
+          <div class="card-head"><div><h2><span class="step">2</span><span id="step2Title">Meet your virtual panel</span></h2><p id="step2Sub" class="subtle">Each examiner focuses on a different part of your defence. Pick any question to practise.</p></div></div>
           <div id="questionList" class="questions-grid"></div>
         </section>
 
         <section class="card hidden" id="answerCard">
-          <div class="card-head">
-            <div>
-              <h2><span class="step">3</span><span id="step3Title">Defend your answer</span></h2>
-              <p id="step3Sub" class="subtle">Answer naturally. Use voice input if your browser supports it, or type as you would speak.</p>
-            </div>
-          </div>
-
-          <div class="selected-panel">
-            <div id="selectedAvatar" class="avatar">1</div>
-            <div>
-              <div id="selectedRole" class="selected-role">Research supervisor</div>
-              <div id="selectedQuestion" class="selected-question"></div>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn btn-ghost" id="hearBtn" type="button">🔊 Hear question</button>
-            <button class="btn btn-ghost" id="dictateBtn" type="button">🎙 Speak answer</button>
-            <button class="btn btn-secondary" id="sampleAnswerBtn" type="button">Use sample answer</button>
-          </div>
-
+          <div class="card-head"><div><h2><span class="step">3</span><span id="step3Title">Defend your answer</span></h2><p id="step3Sub" class="subtle">Answer naturally. Use voice input where your browser supports it, or type as you would speak.</p></div></div>
+          <div class="selected-panel"><div id="selectedAvatar" class="avatar">1</div><div><div id="selectedRole" class="selected-role">Research supervisor</div><div id="selectedQuestion" class="selected-question"></div></div></div>
+          <div class="actions"><button class="btn btn-ghost" id="hearBtn" type="button">🔊 Hear question</button><button class="btn btn-ghost" id="dictateBtn" type="button">🎙 Speak answer</button><button class="btn btn-secondary" id="sampleAnswerBtn" type="button">Use sample answer</button></div>
           <label class="field-label" for="answer"><span id="answerLabel">Your answer</span><small id="answerHint">speak or type</small></label>
           <textarea id="answer" maxlength="6000" placeholder="Answer as if the panel were in front of you…"></textarea>
           <div class="counter"><span id="answerCount">0</span> <span id="wordsLabel">words</span></div>
           <div id="voiceStatus" class="status" role="status" aria-live="polite"></div>
-          <div class="actions">
-            <button class="btn btn-primary" id="evaluateBtn" type="button">Evaluate this answer</button>
-          </div>
+          <div class="actions"><button class="btn btn-primary" id="evaluateBtn" type="button">Evaluate this answer</button></div>
           <div id="evaluateError" class="error" role="alert" aria-live="assertive"></div>
         </section>
 
         <section class="card hidden" id="resultCard" aria-live="polite">
-          <div class="card-head">
-            <div>
-              <h2><span class="step">4</span><span id="step4Title">Coach review</span></h2>
-              <p id="resultSub" class="subtle">Use the breakdown to improve the next answer, not just chase a score.</p>
-            </div>
-          </div>
-
+          <div class="card-head"><div><h2><span class="step">4</span><span id="step4Title">Coach review</span></h2><p id="resultSub" class="subtle">Use the breakdown to improve the next answer, not just chase a score.</p></div></div>
           <div id="resultNotice" class="notice hidden"></div>
-          <div class="result-top">
-            <div class="score-ring" id="scoreRing">
-              <div class="score-inner">
-                <div id="score" class="score">—</div>
-                <div id="scoreCaption" class="score-caption">readiness score</div>
-              </div>
-            </div>
-            <div id="breakdown" class="breakdown"></div>
-          </div>
-
-          <div class="result-grid">
-            <div class="mini-result">
-              <strong id="strengthsTitle">What worked</strong>
-              <ul id="strengths"></ul>
-            </div>
-            <div class="mini-result">
-              <strong id="improvementsTitle">Improve next</strong>
-              <ul id="improvements"></ul>
-            </div>
-          </div>
-
-          <h3 id="feedbackTitle">Coach note</h3>
-          <div id="feedback" class="result-box"></div>
-          <h3 id="improvedTitle">Stronger answer framework</h3>
-          <div id="improved" class="result-box"></div>
+          <div class="result-top"><div class="score-ring" id="scoreRing"><div class="score-inner"><div id="score" class="score">—</div><div id="scoreCaption" class="score-caption">readiness score</div></div></div><div id="breakdown" class="breakdown"></div></div>
+          <div class="result-grid"><div class="mini-result"><strong id="strengthsTitle">What worked</strong><ul id="strengths"></ul></div><div class="mini-result"><strong id="improvementsTitle">Improve next</strong><ul id="improvements"></ul></div></div>
+          <h3 id="feedbackTitle">Coach note</h3><div id="feedback" class="result-box"></div>
+          <h3 id="improvedTitle">Stronger answer framework</h3><div id="improved" class="result-box"></div>
           <div class="tip"><span>💡</span><span id="nextTip"></span></div>
-
-          <div class="actions">
-            <button class="btn btn-green" id="copyBtn" type="button">Copy answer framework</button>
-            <button class="btn btn-primary" id="nextBtn" type="button">Practise another question</button>
-            <button class="btn btn-secondary" id="resetBtn" type="button">Start a new session</button>
-          </div>
+          <div class="actions"><button class="btn btn-green" id="copyBtn" type="button">Copy answer framework</button><button class="btn btn-primary" id="nextBtn" type="button">Practise another question</button><button class="btn btn-secondary" id="resetBtn" type="button">Start a new session</button></div>
           <div id="copyStatus" class="status" role="status" aria-live="polite"></div>
         </section>
       </section>
@@ -388,404 +305,141 @@
       <aside class="side">
         <section class="side-card">
           <h3 id="progressTitle" class="side-title">Practice progress</h3>
-          <div class="progress-block">
-            <div class="progress-line"><span id="progressBar"></span></div>
-            <div class="progress-meta"><span id="progressText">0 of 5 practised</span><span id="progressPercent">0%</span></div>
-          </div>
-          <div class="summary-stats">
-            <div class="stat"><b id="averageScore">—</b><span id="averageLabel">average score</span></div>
-            <div class="stat"><b id="focusArea">—</b><span id="focusLabel">focus area</span></div>
-          </div>
+          <div class="progress-line"><span id="progressBar"></span></div>
+          <div class="progress-meta"><span id="progressText">0 of 5 practised</span><span id="progressPercent">0%</span></div>
+          <div class="summary-stats"><div class="stat"><b id="averageScore">—</b><span id="averageLabel">average score</span></div><div class="stat"><b id="focusArea">—</b><span id="focusLabel">focus area</span></div></div>
         </section>
-
+        <section class="side-card">
+          <h3 id="languagesTitle" class="side-title">Languages across the experience</h3>
+          <div class="language-cloud"><span class="language-chip">English</span><span class="language-chip">Hausa</span><span class="language-chip">Yorùbá</span><span class="language-chip">Igbo</span><span class="language-chip">Kiswahili</span><span class="language-chip">isiZulu</span></div>
+        </section>
         <section class="side-card">
           <h3 id="howTitle" class="side-title">How it works</h3>
           <div class="how-item"><b>1</b><span id="how1">Add a topic, summary, or thesis file.</span></div>
           <div class="how-item"><b>2</b><span id="how2">A five-role panel asks different defence questions.</span></div>
           <div class="how-item"><b>3</b><span id="how3">Practise answers and improve weak areas across the session.</span></div>
         </section>
-
         <section class="side-card">
           <h3 id="privacyTitle" class="side-title">Privacy by default</h3>
-          <div class="privacy"><span>🔐</span><span id="privacyText">No account or database. Uploaded files are read in memory and not saved. Draft text is kept only for this browser tab.</span></div>
+          <div class="privacy"><span>🔐</span><span id="privacyText">No account or database. Uploaded files are read in memory and not saved. Draft text stays only in this browser tab.</span></div>
           <span id="privacyBadge" class="mini-badge">No permanent thesis storage</span>
         </section>
       </aside>
     </div>
-
-    <footer id="footerText">Hackathon prototype · Final Defence Coach · Built for TNGIMPACT AI Challenge 2026</footer>
+    <footer id="footerText">Final Defence Coach · Built for TNGIMPACT AI Challenge 2026</footer>
   </main>
 
   <script>
-    const $ = (id) => document.getElementById(id);
+    const $ = id => document.getElementById(id);
+    const supportedLanguages = ['en','ha','yo','ig','sw','zu'];
+    const speechLanguages = {en:'en-US',ha:'ha-NG',yo:'yo-NG',ig:'ig-NG',sw:'sw-KE',zu:'zu-ZA'};
     let questions = [];
     let currentQuestionIndex = 0;
     let results = {};
     let recognition = null;
 
     const examples = {
-      en: {
-        topic: 'AI-assisted crop disease detection for smallholder farmers',
-        abstract: 'This project explores a lightweight image-based AI workflow that can help smallholder farmers identify visible crop disease symptoms earlier. The prototype focuses on accessibility in low-resource settings, simple mobile use, and clear next-step guidance rather than replacing agricultural experts.',
-        answer: 'The main problem is delayed identification of visible crop disease symptoms. Smallholder farmers may not have immediate access to an expert, so the project uses a lightweight AI workflow to provide an earlier signal. The goal is not to replace an agronomist but to help a farmer decide when to seek support sooner. A key limitation is that image quality and local disease variation can affect the result, so expert confirmation remains important.'
-      },
-      ha: {
-        topic: 'AI wajen taimakawa kananan manoma gano cututtukan amfanin gona',
-        abstract: 'Wannan aikin yana nazarin yadda za a yi amfani da AI mai sauki wajen taimakawa kananan manoma su gano alamun cututtukan amfanin gona daga hotuna da wuri. An fi mayar da hankali kan saukin amfani da waya, wuraren da kayan aiki suke da karanci, da bayar da shawarar mataki na gaba ba tare da maye gurbin kwararren noma ba.',
-        answer: 'Babban matsalar ita ce jinkirin gano alamun cutar amfanin gona. Wasu kananan manoma ba sa samun kwararren noma nan take, saboda haka aikin yana amfani da AI mai sauki domin bayar da alamar farko. Manufar ba ita ce maye gurbin kwararre ba, sai dai taimakawa manomi ya san lokacin neman karin taimako. Babban iyaka shi ne ingancin hoto da bambancin cututtuka a wurare daban-daban.'
-      }
+      en:{topic:'AI-assisted crop disease detection for smallholder farmers',abstract:'This project explores a lightweight image-based AI workflow that can help smallholder farmers identify visible crop disease symptoms earlier. It focuses on mobile access, low-resource settings and clear next-step guidance without replacing agricultural experts.',answer:'The main problem is delayed identification of visible crop disease symptoms. Smallholder farmers may not have immediate access to an expert, so the project provides an earlier signal. The goal is not to replace an agronomist but to help a farmer decide when to seek support sooner. A key limitation is that image quality and local disease variation can affect the result.'},
+      ha:{topic:'AI wajen taimakawa ƙananan manoma gano cututtukan amfanin gona',abstract:'Wannan aikin yana nazarin amfani da AI mai sauƙi wajen taimakawa ƙananan manoma su gano alamun cututtukan amfanin gona daga hotuna da wuri, musamman a wuraren da kayan aiki suke da ƙaranci.',answer:'Babban matsalar ita ce jinkirin gano alamun cutar amfanin gona. Wasu ƙananan manoma ba sa samun ƙwararren noma nan take, saboda haka aikin yana bayar da alamar farko. Manufar ba ita ce maye gurbin ƙwararre ba, sai dai taimakawa manomi ya san lokacin neman ƙarin taimako.'},
+      yo:{topic:'Lílo AI láti ṣèrànwọ́ fún àwọn agbẹ kékeré láti mọ àrùn irugbin',abstract:'Iṣẹ́ yìí ń ṣàyẹ̀wò bí AI tó rọrùn ṣe lè lo fọ́tò láti ran àwọn agbẹ kékeré lọ́wọ́ láti rí àmì àrùn irugbin ní kutukutu, pàápàá ní ibi tí ohun èlò kò pọ̀.',answer:'Ìṣòro pàtàkì ni pé a máa ń pẹ́ kí a tó mọ àmì àrùn irugbin. Ọ̀pọ̀ agbẹ kékeré kò ní amòye nítòsí, nítorí náà iṣẹ́ yìí fẹ́ fún wọn ní ìkìlọ̀ àkọ́kọ́. Kì í ṣe láti rọ́pò amòye, bí kò ṣe láti mọ ìgbà tí wọ́n yẹ kí wọ́n wá ìrànlọ́wọ́.'},
+      ig:{topic:'Iji AI nyere obere ndị ọrụ ugbo aka ịchọpụta ọrịa ihe ọkụkụ',abstract:'Ọrụ a na-enyocha otu AI dị mfe nwere ike isi jiri foto nyere obere ndị ọrụ ugbo aka ịchọpụta akara ọrịa ihe ọkụkụ n’oge, karịchaa n’ebe akụrụngwa dị ntakịrị.',answer:'Nsogbu bụ na a na-achọpụta ọrịa ihe ọkụkụ n’oge na-adịghị mma. Ụfọdụ obere ndị ọrụ ugbo enweghị ọkachamara nso, ya mere usoro a na-enye akara mbụ. Ebumnuche abụghị dochie ọkachamara kama inyere onye ọrụ ugbo mara mgbe ọ kwesịrị ịchọ enyemaka.'},
+      sw:{topic:'AI kusaidia wakulima wadogo kutambua magonjwa ya mazao',abstract:'Mradi huu unachunguza mfumo mwepesi wa AI unaotumia picha kusaidia wakulima wadogo kutambua dalili za magonjwa ya mazao mapema, hasa katika mazingira yenye rasilimali chache.',answer:'Tatizo kuu ni kuchelewa kutambua dalili za magonjwa ya mazao. Wakulima wadogo wanaweza kukosa mtaalamu karibu, kwa hiyo mfumo huu unatoa ishara ya mapema. Lengo si kuchukua nafasi ya mtaalamu bali kusaidia mkulima kujua wakati wa kutafuta msaada zaidi.'},
+      zu:{topic:'Ukusebenzisa i-AI ukusiza abalimi abancane ukubona izifo zezitshalo',abstract:'Le phrojekthi ihlola indlela elula ye-AI esebenzisa izithombe ukusiza abalimi abancane ukubona izimpawu zezifo zezitshalo kusenesikhathi, ikakhulukazi ezindaweni ezinezinsiza ezincane.',answer:'Inkinga enkulu ukubambezeleka ekuboneni izimpawu zezifo zezitshalo. Abalimi abancane bangase bangabi nochwepheshe eduze, ngakho uhlelo lunikeza isexwayiso sokuqala. Inhloso akukhona ukufaka uchwepheshe esikhundleni kodwa ukusiza umlimi azi ukuthi kufanele afune nini usizo olwengeziwe.'}
+    };
+
+    const base = {
+      eyebrow:'AI for Education · Built for Africa',heroText:'Turn your thesis into a realistic mock defence panel. Practise hard questions, answer by voice or text, and improve with structured coaching.',languageLabel:'Choose language',guidedDemoBtn:'⚡ Try the 30-second demo',jumpStartBtn:'Use my own research',pillPanel:'5-examiner virtual panel',pillLocal:'Multilingual for Africa',pillUpload:'PDF / TXT / MD',
+      step1Title:'Bring your research',step1Sub:'A topic is enough. Add a summary or upload your thesis for more specific panel questions.',topicLabel:'Thesis topic',topicHint:'required',abstractLabel:'Research context',abstractHint:'optional',topicPlaceholder:'e.g. AI-assisted crop disease detection for smallholder farmers',abstractPlaceholder:'Paste your abstract, methods, findings, or a short project summary.',uploadTitle:'Upload thesis or notes',uploadSub:'PDF, TXT or Markdown · max 6 MB · extracted text is not stored on the server.',uploadBtn:'Choose file',exampleBtn:'✨ Use example',generateBtn:'Build my defence panel',
+      step2Title:'Meet your virtual panel',step2Sub:'Each examiner focuses on a different part of your defence. Pick any question to practise.',step3Title:'Defend your answer',step3Sub:'Answer naturally. Use voice input where your browser supports it, or type as you would speak.',hearBtn:'🔊 Hear question',dictateBtn:'🎙 Speak answer',sampleAnswerBtn:'Use sample answer',answerLabel:'Your answer',answerHint:'speak or type',answerPlaceholder:'Answer as if the panel were in front of you…',wordsLabel:'words',evaluateBtn:'Evaluate this answer',
+      step4Title:'Coach review',resultSub:'Use the breakdown to improve the next answer, not just chase a score.',scoreCaption:'readiness score',strengthsTitle:'What worked',improvementsTitle:'Improve next',feedbackTitle:'Coach note',improvedTitle:'Stronger answer framework',copyBtn:'Copy answer framework',nextBtn:'Practise another question',resetBtn:'Start a new session',progressTitle:'Practice progress',averageLabel:'average score',focusLabel:'focus area',languagesTitle:'Languages across the experience',howTitle:'How it works',how1:'Add a topic, summary, or thesis file.',how2:'A five-role panel asks different defence questions.',how3:'Practise answers and improve weak areas across the session.',privacyTitle:'Privacy by default',privacyText:'No account or database. Uploaded files are read in memory and not saved. Draft text stays only in this browser tab.',privacyBadge:'No permanent thesis storage',footerText:'Final Defence Coach · Built for TNGIMPACT AI Challenge 2026',
+      topicRequired:'Add a thesis topic first.',answerRequired:'Give an answer before asking for feedback.',generating:'Building your five-examiner panel…',evaluating:'Reviewing your answer…',uploadReading:'Reading file…',uploadDone:'Research context loaded from',uploadTruncated:'Only the first 12,000 characters were used.',uploadFailed:'Could not read that file.',requestFailed:'Something went wrong. Please try again.',copied:'Answer framework copied.',listening:'Listening… speak naturally.',voiceUnavailable:'Voice input is not supported in this browser. You can still type your answer.',heard:'Reading the selected examiner question aloud.',demoLoaded:'Example loaded. Building the panel now…',modeDemo:'Demo simulation',modeLive:'Live AI',practised:'practised',focusNone:'—',clarity:'Clarity',relevance:'Relevance',evidence:'Evidence',structure:'Structure',fileTooBig:'Choose a file up to 6 MB.'
     };
 
     const translations = {
-      en: {
-        eyebrow: 'AI for Education · Africa', heroText: 'Turn your thesis into a realistic mock defence panel. Practise examiner questions, speak or type your answer, and get structured coaching in English or Hausa.',
-        languageLabel: 'Language', guidedDemoBtn: '⚡ Try the 30-second demo', jumpStartBtn: 'Use my own research', pillPanel: '5-examiner virtual panel', pillLocal: 'English + Hausa', pillUpload: 'PDF / TXT / MD',
-        step1Title: 'Add your research', step1Sub: 'A topic is enough. Add a summary or upload your thesis for more specific panel questions.', topicLabel: 'Thesis topic', topicHint: 'required', abstractLabel: 'Research context', abstractHint: 'optional',
-        topicPlaceholder: 'e.g. AI-assisted crop disease detection for smallholder farmers', abstractPlaceholder: 'Paste your abstract, methods, findings, or a short project summary.', uploadTitle: 'Upload thesis or notes', uploadSub: 'PDF, TXT or Markdown · max 6 MB · extracted text is not stored on the server.', uploadBtn: 'Choose file', exampleBtn: '✨ Use example', generateBtn: 'Build my defence panel',
-        step2Title: 'Meet your virtual panel', step2Sub: 'Each examiner focuses on a different part of your defence. Pick any question to practise.', step3Title: 'Defend your answer', step3Sub: 'Answer naturally. Use voice input if your browser supports it, or type as you would speak.', hearBtn: '🔊 Hear question', dictateBtn: '🎙 Speak answer', sampleAnswerBtn: 'Use sample answer', answerLabel: 'Your answer', answerHint: 'speak or type', answerPlaceholder: 'Answer as if the panel were in front of you…', wordsLabel: 'words', evaluateBtn: 'Evaluate this answer',
-        step4Title: 'Coach review', resultSub: 'Use the breakdown to improve the next answer, not just chase a score.', scoreCaption: 'readiness score', strengthsTitle: 'What worked', improvementsTitle: 'Improve next', feedbackTitle: 'Coach note', improvedTitle: 'Stronger answer framework', copyBtn: 'Copy answer framework', nextBtn: 'Practise another question', resetBtn: 'Start a new session',
-        progressTitle: 'Practice progress', averageLabel: 'average score', focusLabel: 'focus area', howTitle: 'How it works', how1: 'Add a topic, summary, or thesis file.', how2: 'A five-role panel asks different defence questions.', how3: 'Practise answers and improve weak areas across the session.', privacyTitle: 'Privacy by default', privacyText: 'No account or database. Uploaded files are read in memory and not saved. Draft text is kept only for this browser tab.', privacyBadge: 'No permanent thesis storage', footerText: 'Hackathon prototype · Final Defence Coach · Built for TNGIMPACT AI Challenge 2026',
-        topicRequired: 'Add a thesis topic first.', answerRequired: 'Give an answer before asking for feedback.', generating: 'Building your five-examiner panel…', evaluating: 'Reviewing your answer…', uploadReading: 'Reading file…', uploadDone: 'Research context loaded from', uploadTruncated: 'Only the first 12,000 characters were used.', uploadFailed: 'Could not read that file.', requestFailed: 'Something went wrong. Please try again.', copied: 'Answer framework copied.', listening: 'Listening… speak naturally.', voiceUnavailable: 'Voice input is not supported in this browser. You can still type your answer.', heard: 'Reading the selected examiner question aloud.', demoLoaded: 'Example loaded. Building the panel now…', modeDemo: 'Demo simulation', modeLive: 'Live AI', modeFallback: 'Fallback coaching', practised: 'practised', focusNone: '—', clarity: 'Clarity', relevance: 'Relevance', evidence: 'Evidence', structure: 'Structure', fileTooBig: 'Choose a file up to 6 MB.'
-      },
-      ha: {
-        eyebrow: 'AI don Ilimi · Afirka', heroText: 'Mayar da bincikenka zuwa atisayen kare digiri da kwamitin kama-da-wane. Yi amsa ta murya ko rubutu sannan ka samu horo cikin Turanci ko Hausa.',
-        languageLabel: 'Harshe', guidedDemoBtn: '⚡ Gwada demo na sakan 30', jumpStartBtn: 'Yi amfani da bincikena', pillPanel: 'Kwamitin masu jarrabawa 5', pillLocal: 'Turanci + Hausa', pillUpload: 'PDF / TXT / MD',
-        step1Title: 'Saka bincikenka', step1Sub: 'Take kadai ya isa. Kara takaitaccen bayani ko fayil domin samun tambayoyi masu dacewa da binciken.', topicLabel: 'Taken bincike', topicHint: 'dole', abstractLabel: 'Bayanan bincike', abstractHint: 'ba dole ba',
-        topicPlaceholder: 'Misali: AI wajen taimakawa kananan manoma gano cututtuka', abstractPlaceholder: 'Manna takaitaccen bayani, hanya, sakamako ko bayanin aikin.', uploadTitle: 'Loda kundin bincike ko bayanai', uploadSub: 'PDF, TXT ko Markdown · har zuwa 6 MB · ba a adana rubutun a server.', uploadBtn: 'Zabi fayil', exampleBtn: '✨ Yi amfani da misali', generateBtn: 'Gina kwamitin kare bincike',
-        step2Title: 'Sadu da kwamitin kama-da-wane', step2Sub: 'Kowane mai jarrabawa yana duba wani bangare daban. Zabi kowace tambaya domin atisaye.', step3Title: 'Kare amsarka', step3Sub: 'Amsa yadda za ka yi a zahiri. Yi amfani da murya idan browser dinka yana goyon baya.', hearBtn: '🔊 Ji tambayar', dictateBtn: '🎙 Yi amsa da murya', sampleAnswerBtn: 'Yi amfani da amsar misali', answerLabel: 'Amsarka', answerHint: 'murya ko rubutu', answerPlaceholder: 'Amsa kamar kwamitin yana gabanka…', wordsLabel: 'kalmomi', evaluateBtn: 'Auna wannan amsa',
-        step4Title: 'Bitar mai horarwa', resultSub: 'Yi amfani da bayanin domin inganta amsa ta gaba, ba wai neman maki kawai ba.', scoreCaption: 'maki na shiri', strengthsTitle: 'Abin da ya yi kyau', improvementsTitle: 'Abin ingantawa', feedbackTitle: 'Shawarar mai horarwa', improvedTitle: 'Tsarin amsa mafi karfi', copyBtn: 'Kwafi tsarin amsa', nextBtn: 'Gwada wata tambaya', resetBtn: 'Fara sabon zama',
-        progressTitle: 'Ci gaban atisaye', averageLabel: 'matsakaicin maki', focusLabel: 'abin mayar da hankali', howTitle: 'Yadda yake aiki', how1: 'Saka take, bayanin bincike ko fayil.', how2: 'Kwamitin mutane biyar yana yin tambayoyi daban-daban.', how3: 'Yi atisaye sannan ka inganta bangaren da ya fi rauni.', privacyTitle: 'Sirri tun daga farko', privacyText: 'Ba a bukatar asusu ko database. Ana karanta fayil a memory ba tare da adanawa ba. Ana rike rubutun ne kawai a wannan tab din browser.', privacyBadge: 'Ba a adana kundin bincike na dindindin', footerText: 'Hackathon prototype · Final Defence Coach · TNGIMPACT AI Challenge 2026',
-        topicRequired: 'Saka taken bincike da farko.', answerRequired: 'Rubuta ko fadi amsa kafin neman shawara.', generating: 'Ana gina kwamitin masu jarrabawa biyar…', evaluating: 'Ana nazarin amsarka…', uploadReading: 'Ana karanta fayil…', uploadDone: 'An saka bayanin bincike daga', uploadTruncated: 'An yi amfani da haruffa 12,000 na farko kawai.', uploadFailed: 'Ba a iya karanta fayil din ba.', requestFailed: 'An samu matsala. Sake gwadawa.', copied: 'An kwafi tsarin amsa.', listening: 'Ana sauraro… yi magana yadda kake so.', voiceUnavailable: 'Wannan browser ba ya goyon bayan shigar murya. Za ka iya rubuta amsarka.', heard: 'Ana karanta tambayar da aka zaba.', demoLoaded: 'An saka misali. Yanzu ana gina kwamitin…', modeDemo: 'Demo simulation', modeLive: 'AI kai tsaye', modeFallback: 'Fallback coaching', practised: 'an yi atisaye', focusNone: '—', clarity: 'Bayyanawa', relevance: 'Dacewa', evidence: 'Hujja', structure: 'Tsari', fileTooBig: 'Zabi fayil mai girman 6 MB ko kasa.'
-      }
+      en:{},
+      ha:{eyebrow:'AI don Ilimi · An gina shi domin Afirka',heroText:'Mayar da bincikenka zuwa atisayen kare digiri da kwamitin kama-da-wane. Amsa da murya ko rubutu sannan ka inganta da horo mai tsari.',languageLabel:'Zaɓi harshe',guidedDemoBtn:'⚡ Gwada demo na sakan 30',jumpStartBtn:'Yi amfani da bincikena',pillPanel:'Kwamitin masu jarrabawa 5',pillLocal:'Harsuna da dama domin Afirka',step1Title:'Saka bincikenka',topicLabel:'Taken bincike',abstractLabel:'Bayanan bincike',uploadTitle:'Loda kundin bincike ko bayanai',uploadBtn:'Zaɓi fayil',exampleBtn:'✨ Yi amfani da misali',generateBtn:'Gina kwamitin kare bincike',step2Title:'Sadu da kwamitinka',step3Title:'Kare amsarka',hearBtn:'🔊 Ji tambayar',dictateBtn:'🎙 Yi amsa da murya',sampleAnswerBtn:'Yi amfani da amsar misali',answerLabel:'Amsarka',wordsLabel:'kalmomi',evaluateBtn:'Auna wannan amsa',step4Title:'Bitar mai horarwa',scoreCaption:'maki na shiri',strengthsTitle:'Abin da ya yi kyau',improvementsTitle:'Abin ingantawa',copyBtn:'Kwafi tsarin amsa',nextBtn:'Gwada wata tambaya',resetBtn:'Fara sabon zama',progressTitle:'Ci gaban atisaye',averageLabel:'matsakaicin maki',focusLabel:'abin mayar da hankali',languagesTitle:'Harsuna a cikin manhajar',howTitle:'Yadda yake aiki',privacyTitle:'Sirri tun daga farko',topicRequired:'Saka taken bincike da farko.',answerRequired:'Ba da amsa kafin neman shawara.',generating:'Ana gina kwamitin masu jarrabawa biyar…',evaluating:'Ana nazarin amsarka…',uploadReading:'Ana karanta fayil…',copied:'An kwafi tsarin amsa.',listening:'Ana sauraro… yi magana yadda kake so.',voiceUnavailable:'Wannan browser ba ya goyon bayan shigar murya.',modeDemo:'Demo simulation',modeLive:'AI kai tsaye',practised:'an yi atisaye',clarity:'Bayyanawa',relevance:'Dacewa',evidence:'Hujja',structure:'Tsari'},
+      yo:{eyebrow:'AI fún Ẹ̀kọ́ · A kọ́ ọ fún Áfíríkà',heroText:'Yí ìwádìí rẹ padà sí ìdánwò àfọwọ́ṣe pẹ̀lú igbimọ̀ olùdánwò. Dáhùn pẹ̀lú ohùn tàbí kíkọ, kí o sì gba ìmọ̀ràn tó ní ètò.',languageLabel:'Yan èdè',guidedDemoBtn:'⚡ Gbìyànjú demo ìṣẹ́jú-aaya 30',jumpStartBtn:'Lo ìwádìí tèmi',pillPanel:'Igbimọ̀ olùdánwò márùn-ún',pillLocal:'Ọ̀pọ̀ èdè fún Áfíríkà',step1Title:'Fi ìwádìí rẹ sílẹ̀',topicLabel:'Àkòrí ìwádìí',abstractLabel:'Àlàyé ìwádìí',uploadTitle:'Gbé thesis tàbí àkọsílẹ̀ wọlé',uploadBtn:'Yan fáìlì',exampleBtn:'✨ Lo àpẹẹrẹ',generateBtn:'Kọ igbimọ̀ ìdáàbòbò mi',step2Title:'Pàdé igbimọ̀ àfọwọ́ṣe rẹ',step3Title:'Dáàbò bo ìdáhùn rẹ',hearBtn:'🔊 Gbọ́ ìbéèrè',dictateBtn:'🎙 Sọ ìdáhùn',sampleAnswerBtn:'Lo ìdáhùn àpẹẹrẹ',answerLabel:'Ìdáhùn rẹ',wordsLabel:'ọ̀rọ̀',evaluateBtn:'Ṣàyẹ̀wò ìdáhùn yìí',step4Title:'Àyẹ̀wò olùkọ́ni',scoreCaption:'dimegilio ìmúrasílẹ̀',strengthsTitle:'Ohun tó ṣiṣẹ́ dáadáa',improvementsTitle:'Ohun láti mú dara',copyBtn:'Daakọ ètò ìdáhùn',nextBtn:'Ṣe ìbéèrè míì',resetBtn:'Bẹ̀rẹ̀ ìdánwò tuntun',progressTitle:'Ìlọsíwájú ìdánwò',averageLabel:'àpapọ̀ dimegilio',focusLabel:'ibi ìdojúkọ',languagesTitle:'Àwọn èdè inú ìrírí',howTitle:'Bí ó ṣe ń ṣiṣẹ́',privacyTitle:'Àṣírí láti ìbẹ̀rẹ̀',topicRequired:'Fi àkòrí ìwádìí sílẹ̀ kọ́kọ́.',answerRequired:'Dáhùn kí o tó béèrè ìmọ̀ràn.',generating:'A ń kọ igbimọ̀ olùdánwò márùn-ún…',evaluating:'A ń ṣàyẹ̀wò ìdáhùn rẹ…',uploadReading:'A ń ka fáìlì…',copied:'A ti daakọ ètò ìdáhùn.',listening:'A ń gbọ́… sọ̀rọ̀ ní ti ara.',voiceUnavailable:'Browser yìí kò ṣe atilẹyin ìforúkọsílẹ̀ ohùn.',modeDemo:'Demo simulation',modeLive:'AI gidi',practised:'ti ṣe ìdánwò',clarity:'Kíkedere',relevance:'Ìbáṣepọ̀',evidence:'Ẹ̀rí',structure:'Ètò'},
+      ig:{eyebrow:'AI maka Mmụta · E wuru ya maka Afrịka',heroText:'Gbanwee nyocha gị ka ọ bụrụ nnwale agbachitere nwere ndị nyocha mebere. Zaa site n’olu ma ọ bụ ederede ma nweta ndụmọdụ ahaziri.',languageLabel:'Họrọ asụsụ',guidedDemoBtn:'⚡ Nwaa demo sekọnd 30',jumpStartBtn:'Jiri nyocha m',pillPanel:'Ndị nyocha 5 mebere',pillLocal:'Ọtụtụ asụsụ maka Afrịka',step1Title:'Tinye nyocha gị',topicLabel:'Isiokwu nyocha',abstractLabel:'Nkọwa nyocha',uploadTitle:'Bulite thesis ma ọ bụ ndetu',uploadBtn:'Họrọ faịlụ',exampleBtn:'✨ Jiri ihe atụ',generateBtn:'Wuo ndị nyocha m',step2Title:'Zute ndị nyocha mebere',step3Title:'Gbachitere azịza gị',hearBtn:'🔊 Gee ajụjụ',dictateBtn:'🎙 Kwuo azịza',sampleAnswerBtn:'Jiri azịza ihe atụ',answerLabel:'Azịza gị',wordsLabel:'okwu',evaluateBtn:'Nyochaa azịza a',step4Title:'Nyocha onye nkuzi',scoreCaption:'akara nkwadebe',strengthsTitle:'Ihe gara nke ọma',improvementsTitle:'Ihe ị ga-emezi',copyBtn:'Detuo usoro azịza',nextBtn:'Mee ajụjụ ọzọ',resetBtn:'Malite nnwale ọhụrụ',progressTitle:'Ọganihu omume',averageLabel:'nkezi akara',focusLabel:'ebe ị ga-elekwasị anya',languagesTitle:'Asụsụ dị na ahụmịhe a',howTitle:'Otu o si arụ ọrụ',privacyTitle:'Nzuzo na mbụ',topicRequired:'Tinye isiokwu nyocha mbụ.',answerRequired:'Nye azịza tupu ịrịọ ndụmọdụ.',generating:'A na-ewu ndị nyocha ise…',evaluating:'A na-enyocha azịza gị…',uploadReading:'A na-agụ faịlụ…',copied:'E detuola usoro azịza.',listening:'A na-ege ntị… kwuo nke ọma.',voiceUnavailable:'Browser a anaghị akwado ntinye olu.',modeDemo:'Demo simulation',modeLive:'AI dị ndụ',practised:'emela omume',clarity:'Ido anya',relevance:'Ịza ihe a jụrụ',evidence:'Ihe akaebe',structure:'Usoro'},
+      sw:{eyebrow:'AI kwa Elimu · Imejengwa kwa Afrika',heroText:'Geuza utafiti wako kuwa mazoezi ya utetezi mbele ya jopo pepe. Jibu kwa sauti au maandishi na upate mafunzo yenye muundo.',languageLabel:'Chagua lugha',guidedDemoBtn:'⚡ Jaribu demo ya sekunde 30',jumpStartBtn:'Tumia utafiti wangu',pillPanel:'Jopo la watahini 5',pillLocal:'Lugha nyingi kwa Afrika',step1Title:'Leta utafiti wako',topicLabel:'Mada ya utafiti',abstractLabel:'Muktadha wa utafiti',uploadTitle:'Pakia thesis au maelezo',uploadBtn:'Chagua faili',exampleBtn:'✨ Tumia mfano',generateBtn:'Tengeneza jopo langu',step2Title:'Kutana na jopo lako',step3Title:'Tetea jibu lako',hearBtn:'🔊 Sikiliza swali',dictateBtn:'🎙 Sema jibu',sampleAnswerBtn:'Tumia jibu la mfano',answerLabel:'Jibu lako',wordsLabel:'maneno',evaluateBtn:'Pima jibu hili',step4Title:'Mapitio ya kocha',scoreCaption:'alama ya utayari',strengthsTitle:'Kilichofanya vizuri',improvementsTitle:'Boresha zaidi',copyBtn:'Nakili muundo wa jibu',nextBtn:'Fanya swali jingine',resetBtn:'Anza kipindi kipya',progressTitle:'Maendeleo ya mazoezi',averageLabel:'wastani wa alama',focusLabel:'eneo la kuzingatia',languagesTitle:'Lugha katika uzoefu huu',howTitle:'Jinsi inavyofanya kazi',privacyTitle:'Faragha kwanza',topicRequired:'Weka mada ya utafiti kwanza.',answerRequired:'Toa jibu kabla ya kuomba maoni.',generating:'Tunaunda jopo la watahini watano…',evaluating:'Tunapitia jibu lako…',uploadReading:'Tunasoma faili…',copied:'Muundo wa jibu umenakiliwa.',listening:'Tunasikiliza… sema kawaida.',voiceUnavailable:'Kivinjari hiki hakitumii uingizaji wa sauti.',modeDemo:'Demo simulation',modeLive:'AI moja kwa moja',practised:'yamefanyiwa mazoezi',clarity:'Uwazi',relevance:'Uhusiano',evidence:'Ushahidi',structure:'Muundo'},
+      zu:{eyebrow:'AI Yezemfundo · Yakhelwe i-Afrika',heroText:'Guqula ucwaningo lwakho lube ukuzilolonga kokuvikela phambi kwejopo elibonakalayo. Phendula ngezwi noma ngokubhala bese uthola ukuqeqeshwa okuhlelekile.',languageLabel:'Khetha ulimi',guidedDemoBtn:'⚡ Zama i-demo yemizuzwana 30',jumpStartBtn:'Sebenzisa ucwaningo lwami',pillPanel:'Ijopo labahloli aba-5',pillLocal:'Izilimi eziningi ze-Afrika',step1Title:'Faka ucwaningo lwakho',topicLabel:'Isihloko socwaningo',abstractLabel:'Umongo wocwaningo',uploadTitle:'Layisha thesis noma amanothi',uploadBtn:'Khetha ifayela',exampleBtn:'✨ Sebenzisa isibonelo',generateBtn:'Yakha ijopo lami',step2Title:'Hlangana nejopo lakho',step3Title:'Vikela impendulo yakho',hearBtn:'🔊 Lalela umbuzo',dictateBtn:'🎙 Khuluma impendulo',sampleAnswerBtn:'Sebenzisa impendulo yesibonelo',answerLabel:'Impendulo yakho',wordsLabel:'amagama',evaluateBtn:'Hlola le mpendulo',step4Title:'Ukubuyekezwa komqeqeshi',scoreCaption:'izinga lokulungela',strengthsTitle:'Okusebenze kahle',improvementsTitle:'Okufanele kuthuthukiswe',copyBtn:'Kopisha uhlaka lwempendulo',nextBtn:'Zama omunye umbuzo',resetBtn:'Qala iseshini entsha',progressTitle:'Inqubekela yokuzilolonga',averageLabel:'isilinganiso samaphuzu',focusLabel:'indawo yokugxila',languagesTitle:'Izilimi kulo lonke ulwazi',howTitle:'Isebenza kanjani',privacyTitle:'Ubumfihlo kuqala',topicRequired:'Faka isihloko socwaningo kuqala.',answerRequired:'Nikeza impendulo ngaphambi kokucela impendulo yomqeqeshi.',generating:'Sakha ijopo labahloli abahlanu…',evaluating:'Sibuyekeza impendulo yakho…',uploadReading:'Sifunda ifayela…',copied:'Uhlaka lwempendulo lukopishiwe.',listening:'Siyalalela… khuluma ngokwemvelo.',voiceUnavailable:'Lesi siphequluli asisekeli ukufakwa kwezwi.',modeDemo:'Demo simulation',modeLive:'AI ebukhoma',practised:'kuqeqeshiwe',clarity:'Ukucaca',relevance:'Ukuhambisana',evidence:'Ubufakazi',structure:'Isakhiwo'}
     };
 
-    function lang() { return $('language').value; }
-    function t() { return translations[lang()]; }
+    function lang(){ return $('language').value; }
+    function t(){ return {...base,...(translations[lang()] || {})}; }
 
-    function applyLanguage() {
-      const tr = t();
-      document.documentElement.lang = lang();
-      const textMap = ['eyebrow','heroText','languageLabel','guidedDemoBtn','jumpStartBtn','pillPanel','pillLocal','pillUpload','step1Title','step1Sub','topicLabel','topicHint','abstractLabel','abstractHint','uploadTitle','uploadSub','uploadBtn','exampleBtn','generateBtn','step2Title','step2Sub','step3Title','step3Sub','hearBtn','dictateBtn','sampleAnswerBtn','answerLabel','answerHint','wordsLabel','evaluateBtn','step4Title','resultSub','scoreCaption','strengthsTitle','improvementsTitle','feedbackTitle','improvedTitle','copyBtn','nextBtn','resetBtn','progressTitle','averageLabel','focusLabel','howTitle','how1','how2','how3','privacyTitle','privacyText','privacyBadge','footerText'];
-      textMap.forEach(id => { if ($(id) && tr[id] !== undefined) $(id).textContent = tr[id]; });
-      $('topic').placeholder = tr.topicPlaceholder;
-      $('abstract').placeholder = tr.abstractPlaceholder;
-      $('answer').placeholder = tr.answerPlaceholder;
-      updateModePill(window.appHealth || null);
-      renderQuestions();
-      renderSelectedQuestion();
-      updateProgress();
+    function applyLanguage(){
+      const tr=t(); document.documentElement.lang=lang();
+      const ids=['eyebrow','heroText','languageLabel','guidedDemoBtn','jumpStartBtn','pillPanel','pillLocal','pillUpload','step1Title','step1Sub','topicLabel','topicHint','abstractLabel','abstractHint','uploadTitle','uploadSub','uploadBtn','exampleBtn','generateBtn','step2Title','step2Sub','step3Title','step3Sub','hearBtn','dictateBtn','sampleAnswerBtn','answerLabel','answerHint','wordsLabel','evaluateBtn','step4Title','resultSub','scoreCaption','strengthsTitle','improvementsTitle','feedbackTitle','improvedTitle','copyBtn','nextBtn','resetBtn','progressTitle','averageLabel','focusLabel','languagesTitle','howTitle','how1','how2','how3','privacyTitle','privacyText','privacyBadge','footerText'];
+      ids.forEach(id=>{ if($(id) && tr[id]!==undefined) $(id).textContent=tr[id]; });
+      $('topic').placeholder=tr.topicPlaceholder; $('abstract').placeholder=tr.abstractPlaceholder; $('answer').placeholder=tr.answerPlaceholder;
+      updateModePill(window.appHealth || null); renderQuestions(); renderSelectedQuestion(); updateProgress();
     }
 
-    async function postJSON(url, body) {
-      const response = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
-      let data = {};
-      try { data = await response.json(); } catch (_) {}
-      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : t().requestFailed);
-      return data;
+    async function postJSON(url,body){ const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); const data=await response.json(); if(!response.ok) throw new Error(data.detail || t().requestFailed); return data; }
+    function fillExample(){ const ex=examples[lang()] || examples.en; $('topic').value=ex.topic; $('abstract').value=ex.abstract; $('answer').value=''; persistDraft(); updateCounts(); }
+    async function guidedDemo(){ fillExample(); $('fileStatus').textContent=t().demoLoaded; await generatePanel(); }
+
+    async function generatePanel(){
+      const topic=$('topic').value.trim(); if(!topic){ $('generateError').textContent=t().topicRequired; $('topic').focus(); return; }
+      $('generateError').textContent=''; $('generateNotice').classList.add('hidden'); $('generateBtn').disabled=true; $('generateBtn').textContent=t().generating;
+      try{ const data=await postJSON('/api/questions',{topic,abstract:$('abstract').value.trim(),language:lang()}); questions=data.questions || []; currentQuestionIndex=0; results={}; sessionStorage.removeItem('fdc-results'); renderQuestions(); renderSelectedQuestion(); updateProgress(); $('questionsCard').classList.remove('hidden'); $('answerCard').classList.remove('hidden'); $('resultCard').classList.add('hidden'); $('answer').value=''; if(data.notice){$('generateNotice').textContent=data.notice;$('generateNotice').classList.remove('hidden');} $('questionsCard').scrollIntoView({behavior:'smooth',block:'start'}); }
+      catch(err){ $('generateError').textContent=err.message || t().requestFailed; }
+      finally{ $('generateBtn').disabled=false; $('generateBtn').textContent=t().generateBtn; }
     }
 
-    function fillExample() {
-      const sample = examples[lang()];
-      $('topic').value = sample.topic;
-      $('abstract').value = sample.abstract;
-      $('answer').value = '';
-      persistDraft();
-      updateCounts();
+    function renderQuestions(){
+      if(!questions.length){ $('questionList').innerHTML=''; return; }
+      $('questionList').innerHTML=questions.map((item,index)=>{ const done=results[item.id]; return `<button type="button" class="question-card ${index===currentQuestionIndex?'active':''} ${done?'done':''}" data-index="${index}" aria-pressed="${index===currentQuestionIndex}"><span class="avatar">${index+1}</span><span><span class="q-role">${escapeHtml(item.role||'Examiner')}</span><span class="q-text">${escapeHtml(item.question||String(item))}</span><span class="q-category">${escapeHtml(item.category||'Question')}</span></span><span class="done-mark">${done?'✓':''}</span></button>`; }).join('');
+      document.querySelectorAll('.question-card').forEach(btn=>btn.addEventListener('click',()=>selectQuestion(Number(btn.dataset.index))));
     }
+    function selectQuestion(index){ if(!questions[index])return; currentQuestionIndex=index; $('answer').value=''; $('evaluateError').textContent=''; $('voiceStatus').textContent=''; $('resultCard').classList.add('hidden'); renderQuestions(); renderSelectedQuestion(); updateCounts(); $('answerCard').scrollIntoView({behavior:'smooth',block:'center'}); }
+    function renderSelectedQuestion(){ const item=questions[currentQuestionIndex]; if(!item)return; $('selectedAvatar').textContent=currentQuestionIndex+1; $('selectedRole').textContent=item.role||''; $('selectedQuestion').textContent=item.question||''; }
 
-    async function guidedDemo() {
-      fillExample();
-      $('generateNotice').classList.add('hidden');
-      $('generateError').textContent = '';
-      $('fileStatus').textContent = t().demoLoaded;
-      await generatePanel();
-      $('answer').value = examples[lang()].answer;
-      updateCounts();
+    async function evaluateAnswer(){
+      const item=questions[currentQuestionIndex], answer=$('answer').value.trim(); if(!item)return; if(!answer){$('evaluateError').textContent=t().answerRequired;$('answer').focus();return;}
+      $('evaluateError').textContent=''; $('evaluateBtn').disabled=true; $('evaluateBtn').textContent=t().evaluating;
+      try{ const data=await postJSON('/api/evaluate',{topic:$('topic').value.trim(),question:item.question,answer,language:lang()}); results[item.id]={score:data.score,dimensions:data.dimensions}; sessionStorage.setItem('fdc-results',JSON.stringify(results)); showResult(data); renderQuestions(); updateProgress(); $('resultCard').classList.remove('hidden'); $('resultCard').scrollIntoView({behavior:'smooth',block:'start'}); }
+      catch(err){$('evaluateError').textContent=err.message||t().requestFailed;}
+      finally{$('evaluateBtn').disabled=false;$('evaluateBtn').textContent=t().evaluateBtn;}
     }
+    function showResult(data){ $('score').textContent=data.score; $('scoreRing').style.setProperty('--score',data.score); const keys=['clarity','relevance','evidence','structure']; $('breakdown').innerHTML=keys.map(key=>{const value=Number(data.dimensions?.[key]||0);return `<div class="metric-row"><span>${escapeHtml(t()[key])}</span><div class="bar"><span style="width:${value}%"></span></div><b>${value}</b></div>`;}).join(''); $('strengths').innerHTML=(data.strengths||[]).map(x=>`<li>${escapeHtml(x)}</li>`).join(''); $('improvements').innerHTML=(data.improvements||[]).map(x=>`<li>${escapeHtml(x)}</li>`).join(''); $('feedback').textContent=data.feedback||''; $('improved').textContent=data.improved_answer||''; $('nextTip').textContent=data.next_tip||''; if(data.notice){$('resultNotice').textContent=data.notice;$('resultNotice').classList.remove('hidden');}else{$('resultNotice').classList.add('hidden');} }
 
-    async function generatePanel() {
-      const topic = $('topic').value.trim();
-      if (!topic) { $('generateError').textContent = t().topicRequired; $('topic').focus(); return; }
-      $('generateError').textContent = '';
-      $('generateNotice').classList.add('hidden');
-      $('generateBtn').disabled = true;
-      $('generateBtn').textContent = t().generating;
-      try {
-        const data = await postJSON('/api/questions', { topic, abstract: $('abstract').value.trim(), language: lang() });
-        questions = data.questions;
-        results = {};
-        currentQuestionIndex = 0;
-        sessionStorage.setItem('fdc-results', '{}');
-        renderQuestions();
-        renderSelectedQuestion();
-        updateProgress();
-        $('questionsCard').classList.remove('hidden');
-        $('answerCard').classList.remove('hidden');
-        $('resultCard').classList.add('hidden');
-        $('answer').value = '';
-        if (data.notice) { $('generateNotice').textContent = data.notice; $('generateNotice').classList.remove('hidden'); }
-        $('questionsCard').scrollIntoView({behavior:'smooth', block:'start'});
-      } catch (err) {
-        $('generateError').textContent = err.message || t().requestFailed;
-      } finally {
-        $('generateBtn').disabled = false;
-        $('generateBtn').textContent = t().generateBtn;
-      }
-    }
+    function updateProgress(){ const completed=Object.keys(results).filter(k=>results[k]).length,total=questions.length||5,percent=Math.round((completed/total)*100); $('progressBar').style.width=`${percent}%`; $('progressText').textContent=`${completed} / ${total} ${t().practised}`; $('progressPercent').textContent=`${percent}%`; const entries=Object.values(results); if(!entries.length){$('averageScore').textContent='—';$('focusArea').textContent=t().focusNone;return;} $('averageScore').textContent=Math.round(entries.reduce((s,x)=>s+Number(x.score||0),0)/entries.length); const totals={clarity:0,relevance:0,evidence:0,structure:0}; entries.forEach(item=>Object.keys(totals).forEach(key=>totals[key]+=Number(item.dimensions?.[key]||0))); const weakest=Object.keys(totals).sort((a,b)=>totals[a]-totals[b])[0]; $('focusArea').textContent=t()[weakest]; }
+    function nextQuestion(){ if(!questions.length)return; let target=questions.findIndex((item,index)=>index!==currentQuestionIndex&&!results[item.id]); if(target<0)target=(currentQuestionIndex+1)%questions.length; selectQuestion(target); }
+    function resetSession(){ questions=[];results={};currentQuestionIndex=0;['topic','abstract','answer'].forEach(id=>$(id).value='');['questionsCard','answerCard','resultCard'].forEach(id=>$(id).classList.add('hidden'));$('fileStatus').textContent='';$('generateError').textContent='';$('generateNotice').classList.add('hidden');sessionStorage.removeItem('fdc-draft');sessionStorage.removeItem('fdc-results');updateCounts();updateProgress();$('researchCard').scrollIntoView({behavior:'smooth'}); }
 
-    function renderQuestions() {
-      if (!questions.length) return;
-      $('questionList').innerHTML = questions.map((item, index) => {
-        const done = results[item.id];
-        const role = escapeHtml(item.role || 'Examiner');
-        const category = escapeHtml(item.category || 'Question');
-        const question = escapeHtml(item.question || String(item));
-        return `<button type="button" class="question-card ${index === currentQuestionIndex ? 'active' : ''} ${done ? 'done' : ''}" data-index="${index}" aria-pressed="${index === currentQuestionIndex}">
-          <span class="avatar">${index + 1}</span>
-          <span><span class="q-role">${role}</span><span class="q-text">${question}</span><span class="q-category">${category}</span></span>
-          <span class="done-mark">${done ? '✓' : ''}</span>
-        </button>`;
-      }).join('');
-      document.querySelectorAll('.question-card').forEach(btn => btn.addEventListener('click', () => selectQuestion(Number(btn.dataset.index))));
-    }
+    async function uploadResearch(file){ if(!file)return; if(file.size>6*1024*1024){$('fileStatus').textContent=t().fileTooBig;return;} $('fileStatus').textContent=t().uploadReading; const formData=new FormData(); formData.append('file',file); try{const response=await fetch('/api/extract',{method:'POST',body:formData});const data=await response.json();if(!response.ok)throw new Error(data.detail||t().uploadFailed);$('abstract').value=data.text||'';if(!$('topic').value.trim()&&data.suggested_topic)$('topic').value=data.suggested_topic;$('fileStatus').textContent=`${t().uploadDone} ${data.filename}. ${data.truncated?t().uploadTruncated:''}`;persistDraft();updateCounts();}catch(err){$('fileStatus').textContent=err.message||t().uploadFailed;}finally{$('fileInput').value='';} }
 
-    function selectQuestion(index) {
-      if (!questions[index]) return;
-      currentQuestionIndex = index;
-      $('answer').value = '';
-      $('evaluateError').textContent = '';
-      $('voiceStatus').textContent = '';
-      $('resultCard').classList.add('hidden');
-      renderQuestions();
-      renderSelectedQuestion();
-      updateCounts();
-      $('answerCard').scrollIntoView({behavior:'smooth', block:'center'});
-    }
+    function hearQuestion(){ const item=questions[currentQuestionIndex]; if(!item||!('speechSynthesis' in window))return; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(item.question);u.lang=speechLanguages[lang()]||'en-US';u.rate=.96;window.speechSynthesis.speak(u);$('voiceStatus').textContent=t().heard; }
+    function setupVoiceInput(){ const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition){$('dictateBtn').disabled=true;$('dictateBtn').title=t().voiceUnavailable;return;} recognition=new Recognition();recognition.interimResults=true;recognition.continuous=false;recognition.onstart=()=>{$('voiceStatus').textContent=t().listening;$('dictateBtn').disabled=true;};recognition.onend=()=>{$('dictateBtn').disabled=false;};recognition.onerror=()=>{$('voiceStatus').textContent=t().voiceUnavailable;$('dictateBtn').disabled=false;};recognition.onresult=event=>{const text=Array.from(event.results).map(r=>r[0].transcript).join(' ');$('answer').value=text;updateCounts();}; }
+    function startDictation(){ if(!recognition){$('voiceStatus').textContent=t().voiceUnavailable;return;} recognition.lang=speechLanguages[lang()]||'en-US';try{recognition.start();}catch(_){} }
 
-    function renderSelectedQuestion() {
-      const item = questions[currentQuestionIndex];
-      if (!item) return;
-      $('selectedAvatar').textContent = currentQuestionIndex + 1;
-      $('selectedRole').textContent = item.role || '';
-      $('selectedQuestion').textContent = item.question || '';
-    }
+    function updateCounts(){ $('contextCount').textContent=$('abstract').value.length; const words=$('answer').value.trim()?$('answer').value.trim().split(/\s+/).length:0; $('answerCount').textContent=words; persistDraft(); }
+    function persistDraft(){try{sessionStorage.setItem('fdc-draft',JSON.stringify({topic:$('topic').value,abstract:$('abstract').value,language:lang()}));}catch(_){} }
+    function restoreDraft(){try{const draft=JSON.parse(sessionStorage.getItem('fdc-draft')||'{}');if(supportedLanguages.includes(draft.language))$('language').value=draft.language;$('topic').value=draft.topic||'';$('abstract').value=draft.abstract||'';}catch(_){} }
+    function updateModePill(health){if(!health)return;const live=health.mode==='llm';$('modeText').textContent=live?t().modeLive:t().modeDemo;$('modePill').classList.toggle('mode-live',live);$('modePill').classList.toggle('mode-demo',!live);}
+    async function loadHealth(){try{const response=await fetch('/health',{cache:'no-store'});if(!response.ok)return;window.appHealth=await response.json();updateModePill(window.appHealth);}catch(_){$('modeText').textContent='App ready';}}
+    async function copyFramework(){try{await navigator.clipboard.writeText($('improved').textContent);$('copyStatus').textContent=t().copied;}catch(_){$('copyStatus').textContent=t().requestFailed;}}
+    function escapeHtml(value){const div=document.createElement('div');div.textContent=value??'';return div.innerHTML;}
 
-    async function evaluateAnswer() {
-      const item = questions[currentQuestionIndex];
-      const answer = $('answer').value.trim();
-      if (!item) return;
-      if (!answer) { $('evaluateError').textContent = t().answerRequired; $('answer').focus(); return; }
-      $('evaluateError').textContent = '';
-      $('evaluateBtn').disabled = true;
-      $('evaluateBtn').textContent = t().evaluating;
-      try {
-        const data = await postJSON('/api/evaluate', { topic: $('topic').value.trim(), question: item.question, answer, language: lang() });
-        results[item.id] = { score: data.score, dimensions: data.dimensions };
-        sessionStorage.setItem('fdc-results', JSON.stringify(results));
-        showResult(data);
-        renderQuestions();
-        updateProgress();
-        $('resultCard').classList.remove('hidden');
-        $('resultCard').scrollIntoView({behavior:'smooth', block:'start'});
-      } catch (err) {
-        $('evaluateError').textContent = err.message || t().requestFailed;
-      } finally {
-        $('evaluateBtn').disabled = false;
-        $('evaluateBtn').textContent = t().evaluateBtn;
-      }
-    }
+    $('language').addEventListener('change',()=>{persistDraft();applyLanguage();});
+    $('guidedDemoBtn').addEventListener('click',guidedDemo);
+    $('jumpStartBtn').addEventListener('click',()=>$('researchCard').scrollIntoView({behavior:'smooth'}));
+    $('exampleBtn').addEventListener('click',()=>{fillExample();$('fileStatus').textContent='';});
+    $('generateBtn').addEventListener('click',generatePanel);
+    $('fileInput').addEventListener('change',event=>uploadResearch(event.target.files?.[0]));
+    $('sampleAnswerBtn').addEventListener('click',()=>{$('answer').value=(examples[lang()]||examples.en).answer;updateCounts();});
+    $('hearBtn').addEventListener('click',hearQuestion);
+    $('dictateBtn').addEventListener('click',startDictation);
+    $('evaluateBtn').addEventListener('click',evaluateAnswer);
+    $('copyBtn').addEventListener('click',copyFramework);
+    $('nextBtn').addEventListener('click',nextQuestion);
+    $('resetBtn').addEventListener('click',resetSession);
+    $('topic').addEventListener('input',persistDraft);
+    $('abstract').addEventListener('input',updateCounts);
+    $('answer').addEventListener('input',updateCounts);
 
-    function showResult(data) {
-      $('score').textContent = data.score;
-      $('scoreRing').style.setProperty('--score', data.score);
-      const dimensionKeys = ['clarity','relevance','evidence','structure'];
-      $('breakdown').innerHTML = dimensionKeys.map(key => {
-        const value = Number(data.dimensions?.[key] || 0);
-        return `<div class="metric-row"><span>${escapeHtml(t()[key])}</span><div class="bar"><span style="width:${value}%"></span></div><b>${value}</b></div>`;
-      }).join('');
-      $('strengths').innerHTML = (data.strengths || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
-      $('improvements').innerHTML = (data.improvements || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
-      $('feedback').textContent = data.feedback || '';
-      $('improved').textContent = data.improved_answer || '';
-      $('nextTip').textContent = data.next_tip || '';
-      if (data.notice) { $('resultNotice').textContent = data.notice; $('resultNotice').classList.remove('hidden'); } else { $('resultNotice').classList.add('hidden'); }
-    }
-
-    function updateProgress() {
-      const completed = Object.keys(results).filter(key => results[key]).length;
-      const total = questions.length || 5;
-      const percent = Math.round((completed / total) * 100);
-      $('progressBar').style.width = `${percent}%`;
-      $('progressText').textContent = lang() === 'ha' ? `${completed} cikin ${total} ${t().practised}` : `${completed} of ${total} ${t().practised}`;
-      $('progressPercent').textContent = `${percent}%`;
-      const entries = Object.values(results);
-      if (!entries.length) { $('averageScore').textContent = '—'; $('focusArea').textContent = t().focusNone; return; }
-      $('averageScore').textContent = Math.round(entries.reduce((sum, item) => sum + Number(item.score || 0), 0) / entries.length);
-      const totals = {clarity:0,relevance:0,evidence:0,structure:0};
-      entries.forEach(item => Object.keys(totals).forEach(key => totals[key] += Number(item.dimensions?.[key] || 0)));
-      const weakest = Object.keys(totals).sort((a,b) => totals[a] - totals[b])[0];
-      $('focusArea').textContent = t()[weakest];
-    }
-
-    function nextQuestion() {
-      if (!questions.length) return;
-      let target = questions.findIndex((item, index) => index !== currentQuestionIndex && !results[item.id]);
-      if (target < 0) target = (currentQuestionIndex + 1) % questions.length;
-      selectQuestion(target);
-    }
-
-    function resetSession() {
-      questions = [];
-      results = {};
-      currentQuestionIndex = 0;
-      $('topic').value = '';
-      $('abstract').value = '';
-      $('answer').value = '';
-      $('questionsCard').classList.add('hidden');
-      $('answerCard').classList.add('hidden');
-      $('resultCard').classList.add('hidden');
-      $('fileStatus').textContent = '';
-      $('generateError').textContent = '';
-      $('generateNotice').classList.add('hidden');
-      sessionStorage.removeItem('fdc-draft');
-      sessionStorage.removeItem('fdc-results');
-      updateCounts();
-      updateProgress();
-      $('researchCard').scrollIntoView({behavior:'smooth'});
-    }
-
-    async function uploadResearch(file) {
-      if (!file) return;
-      if (file.size > 6 * 1024 * 1024) { $('fileStatus').textContent = t().fileTooBig; return; }
-      $('fileStatus').textContent = t().uploadReading;
-      const formData = new FormData();
-      formData.append('file', file);
-      try {
-        const response = await fetch('/api/extract', {method:'POST', body:formData});
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.detail || t().uploadFailed);
-        $('abstract').value = data.text || '';
-        if (!$('topic').value.trim() && data.suggested_topic) $('topic').value = data.suggested_topic;
-        $('fileStatus').textContent = `${t().uploadDone} ${data.filename}. ${data.truncated ? t().uploadTruncated : ''}`;
-        persistDraft();
-        updateCounts();
-      } catch (err) {
-        $('fileStatus').textContent = err.message || t().uploadFailed;
-      } finally {
-        $('fileInput').value = '';
-      }
-    }
-
-    function hearQuestion() {
-      const item = questions[currentQuestionIndex];
-      if (!item || !('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(item.question);
-      utterance.lang = lang() === 'ha' ? 'ha-NG' : 'en-US';
-      utterance.rate = 0.96;
-      window.speechSynthesis.speak(utterance);
-      $('voiceStatus').textContent = t().heard;
-    }
-
-    function setupVoiceInput() {
-      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!Recognition) { $('dictateBtn').disabled = true; $('dictateBtn').title = t().voiceUnavailable; return; }
-      recognition = new Recognition();
-      recognition.interimResults = true;
-      recognition.continuous = false;
-      recognition.onstart = () => { $('voiceStatus').textContent = t().listening; $('dictateBtn').disabled = true; };
-      recognition.onend = () => { $('dictateBtn').disabled = false; };
-      recognition.onerror = () => { $('voiceStatus').textContent = t().voiceUnavailable; $('dictateBtn').disabled = false; };
-      recognition.onresult = (event) => {
-        const text = Array.from(event.results).map(result => result[0].transcript).join(' ');
-        $('answer').value = text;
-        updateCounts();
-      };
-    }
-
-    function startDictation() {
-      if (!recognition) { $('voiceStatus').textContent = t().voiceUnavailable; return; }
-      recognition.lang = lang() === 'ha' ? 'ha-NG' : 'en-US';
-      try { recognition.start(); } catch (_) {}
-    }
-
-    function updateCounts() {
-      $('contextCount').textContent = $('abstract').value.length;
-      const words = $('answer').value.trim() ? $('answer').value.trim().split(/\s+/).length : 0;
-      $('answerCount').textContent = words;
-      persistDraft();
-    }
-
-    function persistDraft() {
-      try {
-        sessionStorage.setItem('fdc-draft', JSON.stringify({topic:$('topic').value, abstract:$('abstract').value, language:lang()}));
-      } catch (_) {}
-    }
-
-    function restoreDraft() {
-      try {
-        const draft = JSON.parse(sessionStorage.getItem('fdc-draft') || '{}');
-        if (draft.language === 'en' || draft.language === 'ha') $('language').value = draft.language;
-        $('topic').value = draft.topic || '';
-        $('abstract').value = draft.abstract || '';
-      } catch (_) {}
-    }
-
-    function updateModePill(health) {
-      if (!health) return;
-      const live = health.mode === 'llm';
-      $('modeText').textContent = live ? t().modeLive : t().modeDemo;
-      $('modePill').classList.toggle('mode-live', live);
-      $('modePill').classList.toggle('mode-demo', !live);
-    }
-
-    async function loadHealth() {
-      try {
-        const response = await fetch('/health', {cache:'no-store'});
-        if (!response.ok) return;
-        window.appHealth = await response.json();
-        updateModePill(window.appHealth);
-      } catch (_) { $('modeText').textContent = 'App ready'; }
-    }
-
-    async function copyFramework() {
-      try {
-        await navigator.clipboard.writeText($('improved').textContent);
-        $('copyStatus').textContent = t().copied;
-      } catch (_) {
-        $('copyStatus').textContent = t().requestFailed;
-      }
-    }
-
-    function escapeHtml(value) {
-      const div = document.createElement('div');
-      div.textContent = value ?? '';
-      return div.innerHTML;
-    }
-
-    $('language').addEventListener('change', () => { persistDraft(); applyLanguage(); });
-    $('guidedDemoBtn').addEventListener('click', guidedDemo);
-    $('jumpStartBtn').addEventListener('click', () => $('researchCard').scrollIntoView({behavior:'smooth'}));
-    $('exampleBtn').addEventListener('click', () => { fillExample(); $('fileStatus').textContent = ''; });
-    $('generateBtn').addEventListener('click', generatePanel);
-    $('fileInput').addEventListener('change', event => uploadResearch(event.target.files?.[0]));
-    $('sampleAnswerBtn').addEventListener('click', () => { $('answer').value = examples[lang()].answer; updateCounts(); });
-    $('hearBtn').addEventListener('click', hearQuestion);
-    $('dictateBtn').addEventListener('click', startDictation);
-    $('evaluateBtn').addEventListener('click', evaluateAnswer);
-    $('copyBtn').addEventListener('click', copyFramework);
-    $('nextBtn').addEventListener('click', nextQuestion);
-    $('resetBtn').addEventListener('click', resetSession);
-    $('topic').addEventListener('input', persistDraft);
-    $('abstract').addEventListener('input', updateCounts);
-    $('answer').addEventListener('input', updateCounts);
-
-    restoreDraft();
-    applyLanguage();
-    updateCounts();
-    updateProgress();
-    setupVoiceInput();
-    loadHealth();
+    restoreDraft();applyLanguage();updateCounts();updateProgress();setupVoiceInput();loadHealth();
   </script>
 </body>
 </html>
